@@ -1,0 +1,460 @@
+<!DOCTYPE html>
+<html lang="zh-CN"><head><meta charset="utf-8"/><meta content="initial-scale=1.0" name="viewport"/>
+<title>AI 利润池流向监控 · 数据至 2026-10-09</title>
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+html{font-size:16px}
+body{font-family:-apple-system,"SF Pro Text","PingFang SC","Inter",system-ui,sans-serif;background:#0D1B2A;color:#D8DCE4;line-height:1.6;-webkit-font-smoothing:antialiased}
+:root{--bg-deep:#0D1B2A;--bg-surface:#122333;--bg-elevated:#1A2D42;--bg-hover:#1F334A;--border:#253C53;--text-primary:#EAEDF2;--text-secondary:#98A9C3;--text-muted:#5C7391;--accent:#C99A3E;--positive:#81B29A;--positive-dim:#5A8A74;--danger:#E07A5F;--danger-dim:#B85C42;--info:#60A5FA}
+.container{max-width:1280px;margin:0 auto;padding:0 24px}
+.header{padding:40px 0 32px;border-bottom:1px solid var(--border)}
+.header-inner{display:flex;justify-content:space-between;align-items:flex-start;flex-wrap:wrap;gap:16px}
+.header-left h1{font-size:1.75rem;font-weight:600;letter-spacing:-0.02em;color:var(--text-primary);margin-bottom:6px}
+.header-left .subtitle{font-size:.9rem;color:var(--text-secondary)}
+.header-right{text-align:right}
+.header-right .date{font-size:.8rem;color:var(--text-muted);margin-bottom:4px}
+.header-right .badge{display:inline-block;padding:4px 12px;border-radius:4px;font-size:.75rem;font-weight:500;background:var(--accent);color:#0D1B2A;letter-spacing:.04em}
+.summary-banner{background:var(--bg-surface);border:1px solid var(--border);border-radius:12px;padding:24px 28px;margin:28px 0;display:flex;flex-wrap:wrap;gap:32px;align-items:stretch}
+.summary-main{flex:2;min-width:280px}
+.summary-main .label{font-size:.7rem;text-transform:uppercase;letter-spacing:.08em;color:var(--accent);font-weight:600;margin-bottom:8px}
+.summary-main .thesis{font-size:1.05rem;line-height:1.7;color:var(--text-primary)}
+.summary-main .thesis strong{color:var(--accent);font-weight:600}
+.summary-stats{flex:1;min-width:180px;display:flex;flex-direction:column;gap:8px;justify-content:center}
+.stat-row{display:flex;justify-content:space-between;padding:6px 0;border-bottom:1px solid rgba(37,60,83,.5);font-size:.85rem}
+.stat-row:last-child{border-bottom:none}
+.stat-row .stat-label{color:var(--text-secondary)}.stat-row .stat-value{color:var(--text-primary);font-weight:500}
+.stat-row .stat-value.danger{color:var(--danger)}.stat-row .stat-value.positive{color:var(--positive)}
+.tabs{display:flex;gap:0;border-bottom:1px solid var(--border);margin:0;position:sticky;top:0;z-index:100;background:var(--bg-deep);padding-top:8px;overflow-x:auto}
+.tab-btn{padding:14px 24px;font-size:.85rem;font-weight:500;color:var(--text-muted);background:none;border:none;border-bottom:2px solid transparent;cursor:pointer;transition:all .2s;white-space:nowrap;font-family:inherit}
+.tab-btn:hover{color:var(--text-secondary);background:var(--bg-hover)}.tab-btn.active{color:var(--accent);border-bottom-color:var(--accent)}
+.tab-content{display:none;padding:32px 0 60px}.tab-content.active{display:block}
+.tab-title{font-size:1.3rem;font-weight:600;color:var(--text-primary);margin-bottom:4px}
+.tab-desc{font-size:.85rem;color:var(--text-secondary);margin-bottom:28px}
+.section{margin-bottom:36px}
+.section-header{display:flex;align-items:center;gap:12px;margin-bottom:18px}
+.section-header h2{font-size:1.05rem;font-weight:600;color:var(--text-primary)}
+.section-line{flex:1;height:1px;background:linear-gradient(to right,var(--border),transparent)}
+.card-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(280px,1fr));gap:16px}
+.card{background:var(--bg-surface);border:1px solid var(--border);border-radius:10px;padding:18px 20px}
+.card h3{font-size:.85rem;font-weight:600;color:var(--text-secondary);margin-bottom:8px;text-transform:uppercase;letter-spacing:.04em}
+table{width:100%;border-collapse:collapse;font-size:.82rem}
+th,td{padding:8px 10px;text-align:left;border-bottom:1px solid var(--border);vertical-align:top}
+th{background:var(--bg-surface);color:var(--text-secondary);font-weight:600;font-size:.75rem;text-transform:uppercase;letter-spacing:.03em}
+tr:hover td{background:var(--bg-hover)}.tag{display:inline-block;padding:2px 8px;border-radius:4px;font-size:.72rem;font-weight:500;white-space:nowrap}
+.tag-red{background:rgba(224,122,95,.2);color:var(--danger)}.tag-green{background:rgba(129,178,154,.2);color:var(--positive)}.tag-yellow{background:rgba(201,154,62,.2);color:var(--accent)}.tag-gray{background:rgba(92,115,145,.3);color:var(--text-muted)}
+</style>
+
+<style>
+.tbl{width:100%;border-collapse:collapse;font-size:.8rem;margin-top:6px}
+.tbl th{text-align:left;padding:8px 10px;background:var(--bg-elevated);color:var(--text-secondary);font-weight:500;border-bottom:1px solid var(--border);white-space:nowrap}
+.tbl td{padding:7px 10px;border-bottom:1px solid rgba(37,60,83,.5);color:var(--text-primary);vertical-align:top}
+.tbl tr:last-child td{border-bottom:none}
+.tbl tr:hover td{background:var(--bg-hover)}
+.num{text-align:right;font-variant-numeric:tabular-nums}
+.up{color:var(--positive)}.dn{color:var(--danger)}.fl{color:var(--text-muted)}
+.tag{display:inline-block;padding:1px 7px;border-radius:3px;font-size:.68rem;font-weight:600;letter-spacing:.02em}
+.tag-red{background:rgba(224,122,95,.16);color:var(--danger)}
+.tag-yel{background:rgba(201,154,62,.16);color:var(--accent)}
+.tag-grn{background:rgba(129,178,154,.16);color:var(--positive)}
+.tag-blu{background:rgba(96,165,250,.14);color:var(--info)}
+.tag-gry{background:rgba(92,115,145,.18);color:var(--text-muted)}
+.note{font-size:.76rem;color:var(--text-muted);margin-top:8px;line-height:1.65}
+.note b{color:var(--text-secondary);font-weight:600}
+.callout{background:var(--bg-surface);border-left:3px solid var(--accent);border-radius:0 8px 8px 0;padding:14px 18px;margin:14px 0;font-size:.83rem}
+.callout.red{border-left-color:var(--danger)}
+.callout.grn{border-left-color:var(--positive)}
+.callout.blu{border-left-color:var(--info)}
+.callout b{color:var(--text-primary)}
+.col2{display:grid;grid-template-columns:1fr 1fr;gap:16px}
+@media(max-width:820px){.col2{grid-template-columns:1fr}}
+</style>
+
+</head><body>
+<div class="container">
+  <div class="header"><div class="header-inner">
+    <div class="header-left">
+      <h1>AI 利润池流向监控</h1>
+      <div class="subtitle">M0.5 利润池流向监控 · 数据至 2026-10-09 · 模式 A（周度 · 周末）· 含 NMA</div>
+    </div>
+    <div class="header-right">
+      <div class="date">生成 2026-10-11</div>
+      <div class="badge">周度更新</div>
+    </div>
+  </div></div>
+
+  
+<div class="summary-banner">
+  <div class="summary-main">
+    <div class="label">本期核心结论 · 周度（周末模式）</div>
+    <div class="thesis">本期（数据至 10-09）两条主线是<strong>「终端商业化首次被证伪 vs 供给侧租价反证」</strong>与<strong>「网络安全成为最强轮动」</strong>。① ⚠ <strong>OpenAI 营收与市场预期相差 $200 亿</strong>（10-08）——终端商业化首次直接证伪，当日 <strong>甲骨文 −5%、应用光电 −10%、芯片指数 −3%</strong>；而几乎同时 ⭐ <strong>GPU 租价全面上调</strong>（Nebius 10/1，B300 逼近 $10/GPU-hr）构成硬反证。<br>② <strong>网络安全环节间 20日 +26.0pp（z+1.84⚡）为全场最强</strong>，且两条腿首次同向（大摩上调 Okta $245 + VAR 电话会 + AI 驱动 Q3 加速）——<strong>T2→T1</strong>。<br>③ <strong>存储第四次背离</strong>：美光 FY26Q4 电话会把基本面推到最硬形态（HBM 2027 售罄、26 项 SCA/RPO $1,500亿、2027-28 更紧），而环节间仍 <strong>−8.1pp（最弱之一）</strong>。<br>④ <strong>数据中心「社会许可」成为独立风险因子</strong>：400+ 社区限制、TX 暂停许可、PJM 2027 下调 5GW——压制 L5/L7 的确定性溢价。</div>
+  </div>
+  <div class="summary-stats">
+    <div class="stat-row"><span class="stat-label">数据至</span><span class="stat-value">2026-10-09</span></div>
+    <div class="stat-row"><span class="stat-label">运行模式</span><span class="stat-value">A · 周度（周末）</span></div>
+    <div class="stat-row"><span class="stat-label">环节方向</span><span class="stat-value">7↑ · 3→ · 2↓ · 1不可测 · 1无数据</span></div>
+    <div class="stat-row"><span class="stat-label">环节间最强/最弱（20日相对）</span><span class="stat-value">网安 +26.0pp ⚡ / Neocloud −13.6pp</span></div>
+    <div class="stat-row"><span class="stat-label">利润池 2028E</span><span class="stat-value">~$1,750B（维持）</span></div>
+  </div>
+</div>
+<div class="tabs">
+    <button class="tab-btn active" data-tab="t1">L3 核心结论</button>
+    <button class="tab-btn" data-tab="t2">L1 行情层</button>
+    <button class="tab-btn" data-tab="t3">L2 事件层</button>
+    <button class="tab-btn" data-tab="t4">利润池规模</button>
+    <button class="tab-btn" data-tab="t5">叙事时间线+逻辑链</button>
+    <button class="tab-btn" data-tab="t6">框架附录</button>
+  </div>
+
+  <div class="tab-content active" id="t1"><div class="tab-title">L3 核心结论</div>
+    <div class="tab-desc">L1×L2 交叉合成 · v3.28：L3 判断 = <b>环节间动量（第一）</b> × 环节内 z（第二） × 事件层，双轴同读。数据至 2026-10-09。
+    <b>⚠ 本期 L2 存储/HBM 的「环节内 z」腿不可测（可测 1/3），该环节结论仅取环节间动量 + 事件层。⚠ ETF 持仓未刷新（约 40–45 天），z 基于旧持仓。</b></div>
+    
+<div class="section"><div class="section-header"><h2>交叉判断矩阵</h2><div class="section-line"></div></div>
+<table class="tbl">
+<thead><tr><th>环节</th><th>L2 事件方向</th><th>一致性<br><span style="font-weight:400;font-size:.72em">（环节内 × 环节间）</span></th><th>L3 判断</th><th>Tier</th></tr></thead>
+<tbody>
+<tr><td>网络安全</td><td><span class="tag tag-grn">↑</span> 大摩上调 Okta 至 <b>$245（超配）</b> · VAR 电话会三要点 · <b>AI 驱动 Q3 加速</b></td><td><span class="tag tag-grn"><b>双轴同向（强）</b></span></td><td><b>⭐ 本期最强腿</b>：环间 ⚡ +26pp（全场第一）+ 机构三源确认</td><td>T1</td></tr>
+<tr><td>应用/软件</td><td><span class="tag tag-grn">↑</span> 美国软件行业增长/盈利图谱（10-09）· ZS 单名 <b>+2.82 🔴</b></td><td><span class="tag tag-gray"><b>环间强 / 环内平</b></span></td><td><b>板块整体跑赢但内部无分化</b>（v3.28 主次对调的标准形状）</td><td>T1</td></tr>
+<tr><td>L1 ASIC/推理</td><td><span class="tag tag-grn">↑</span> JPM：WFE 焦点自存储转向逻辑/代工</td><td><span class="tag tag-gray">双轴偏强</span></td><td>环间 20 日强、环内翻正，列为次强腿</td><td>T2</td></tr>
+<tr><td>L1 GPU/算力</td><td><span class="tag tag-grn">↑</span> ⭐ <b>GPU 租价全面上调</b>（Nebius B300 ~$10/hr）· 博通拟为 OpenAI 筹 <b>$300亿</b></td><td><span class="tag tag-gray"><b>绝对/相对分离</b></span></td><td><b>⚠ 供给端紧缺（租价涨）vs 需求端受疑（OpenAI 营收）并存</b></td><td>T1</td></tr>
+<tr><td>L5 数据中心</td><td><span class="tag tag-grn">↑</span> 花旗 AI 基建峰会：<b>棕地升温·土地溢价 $2-3M/MW·400+ 社区限制</b></td><td><span class="tag tag-gray">5日反弹·中期仍弱</span></td><td><b>社会许可升级为独立执行风险</b></td><td>T2</td></tr>
+<tr><td>L4 网络/光模块</td><td><span class="tag tag-grn">↑</span> <b>FCC 拟限 3.2T 光模块</b>利好 Lumentum/Coherent · 硬件网络模型上调（交换机 CAGR 36%）</td><td><span class="tag tag-gray"><b>两腿分歧</b></span></td><td>环内翻红（CSCO +1.76）<b>但环间动能较 W43 ⚡ 明显衰减</b>——降为滚动观察</td><td>T1</td></tr>
+<tr><td>L2 存储/HBM</td><td><span class="tag tag-grn">↑↑</span> <b>美光 FY26Q4 电话会</b>（HBM 2027 售罄+涨价·26 项 SCA/RPO $1,500亿·2027-28 更紧·12/9 起回购）</td><td><span class="tag tag-gray">仅环间腿有效</span></td><td><b>⚠ 第四次背离 · 基本面达最硬形态而环间最弱</b></td><td>T1</td></tr>
+<tr><td>L3 半导体设备</td><td><span class="tag tag-grn">↑</span> 美光财报利好日本半导体设备股 · WSTS 8月逻辑与存储强反弹</td><td><span class="tag tag-gray">W43 动能未延续</span></td><td><b>新立后第二期即 ⚡反转</b>——降级观察</td><td>T2</td></tr>
+<tr><td>L6 Hyperscaler</td><td><span class="tag tag-yel">↓</span> ⚠ <b>OpenAI 营收与预期差 $200亿</b> → Oracle −5% · 谷歌云发 Gemini 通用工作代理</td><td><span class="tag tag-gray"><b>环内强 / 环间中性</b></span></td><td>「内部循环」风险因 OpenAI 预警显性化</td><td>T2</td></tr>
+<tr><td>L9 核能/铀矿</td><td><span class="tag tag-yel">→</span> ⚠ 花旗：先进核能瓶颈在<b>燃料供应</b>（俄浓缩铀占 44%、美国内仅 7%）</td><td><span class="tag tag-gray"><b>双轴背离</b></span></td><td>环内翻正而环间 20 日 ⚡转负——可投性受燃料链约束</td><td>T2</td></tr>
+<tr><td>L7 电力/散热</td><td><span class="tag tag-red">↓</span> <b>TX 暂停新许可</b> · NBC 民调 <b>64% 反对</b> · PJM 2027 下调 5GW（BYOC）</td><td><span class="tag tag-gray"><b>双弱</b></span></td><td><b>社会许可成为新的压制因子</b>（花旗电力追踪）</td><td>T2</td></tr>
+<tr><td>L8 电网/公用事业</td><td><span class="tag tag-yel">→</span> 电力追踪：美国数据中心需求 2026/27 各 <b>+38%</b></td><td><span class="tag tag-gray">双轴背离</span></td><td>环内翻正、环间仍跑输</td><td>T2</td></tr>
+<tr><td>L6 Neocloud</td><td><span class="tag tag-grn">↑</span> 花旗：<b>neocloud 虚拟化把利用率 20-40% → 60-90%</b></td><td><span class="tag tag-gray">价格弱/基本面改善</span></td><td>两条腿背离持续；合成基准读方向不读绝对值</td><td>T2</td></tr>
+</tbody></table>
+<div class="note"><b>💡 本表读法（L3 结论表）：</b>本表只保留<b>结论列</b>。原「L1 z / L1 方向（环节内）」与「环节间动量」三列已移出——这两组是<b>行情读数、不是结论</b>，完整读数与口径见 <b>t2 · L1 行情层</b>（〇 环节间相对动量、一 环节 z-score 矩阵）。<br>⚠ <b>两个 z 的分工（备查）</b>：<b>环节内 z</b> 答「环节内谁领涨（龙头 vs 板块）」；<b>环节间动量 z</b> 答「环节之间谁跑赢」，且为 v3.28 的<b>第一指标</b>。两者会打架——本期网安环节内仅 +0.55，而环节间 <b>+26.0pp（全场第一）</b>。</div>
+</div><div class="section"><div class="section-header"><h2>五大判断</h2><div class="section-line"></div></div>
+<div class="col2"><div class="callout red"><b>① 本期最核心的分歧：终端商业化「首次直接证伪」 vs 供给侧「租价硬反证」——两条证据同时出现</b><br>⚠ <strong>OpenAI 营收与市场预期相差 $200 亿</strong>（Mikko 10-08 转载）——这是本模型运行以来<strong>终端商业化的第一次直接证伪</strong>：此前减速证据多在「价格 / 采用率」层（Ramp 单价、OpenRouter 货币化），本期是<strong>营收兑现本身</strong>不及预期。当日 <strong>甲骨文 −5%、应用光电 −10%、芯片指数 −3%、光通信重挫</strong>。且与 Ramp 企业实付层弱点（单价通缩、Top1% 收缩）<strong>同向</strong>。<br>而几乎同时，⭐ <strong>GPU 租价全面上调</strong>（Nebius 10/1 新价，B300 逼近 <strong>$10/GPU-hr</strong>，各代际普涨）——这是对「减速论」的<strong>硬反证</strong>：若企业真在撤回算力需求，租赁价格应先行回落。另有<strong>博通拟为 OpenAI 筹 $300 亿债务融资</strong>（算力扩张转向杠杆化）。<br>⇒ <strong>需求端「兑现受疑」与供给端「紧缺加剧」并存</strong>，构成本期最核心的未解分歧，直接对应速度 A（buy，承压）与速度 B（build，强劲）的方向分离。<strong>⚠ OpenAI 营收一项目前为单源，需下期核证。</strong></div><div class="callout grn"><b>② 网络安全成为本期最强轮动：环节间 +26pp（z+1.84⚡），且两条腿首次同向</b><br>网络安全<strong>环节间 20 日 +26.0pp（z+1.84⚡）、40 日 +21.1pp（z+1.09⚡）——全场第一</strong>，同时环节内由 W43 的 −0.03 回升至 <strong>+0.55</strong>，<strong>两条腿首次同向</strong>（W43 曾「一弱一强」）。L2 三源确认：<strong>大摩上调 Okta 至 $245（超配）</strong>、网络安全 VAR 电话会三大要点（10-09）、<strong>AI 驱动 Q3 加速</strong>（10-06）、AI 与国家安全政策华盛顿纪要。⇒ 这是本期<strong>证据链最完整</strong>的一处（环间 + 环内 + 机构 + 电话会四层同向），Tier 由 T2 升 T1。<strong>⚠ 提醒</strong>：若只看环节内 z（+0.55）会把它读成「弱」，正是 v3.28 主次对调要修的口径错。</div><div class="callout yel"><b>③ 存储进入第四次背离：基本面被推到最硬形态，环节间仍最弱</b><br>美光 FY26Q4 电话会（10-02）把基本面推到<strong>本模型运行以来最硬</strong>：营收 <strong>$542亿</strong>（环比 +31%）、营业利润率 <strong>82.3%</strong>、<strong>HBM 2027 大部分产能已售罄且价格大幅上涨</strong>（缩小与非 HBM 的毛利差）、<strong>26 项 SCA 锁定至 2030 年 35%+ 营收（RPO ~$1,500亿）</strong>、FY27Q1 指引 $615亿 / 毛利率 ~86.25%，并称 <strong>2027–2028 供需比 2026 紧张得多、看不到恢复平衡的时间线</strong>；12/9 起增加资本回报（回购）。<br>而<strong>存储环节间腿 20 日 −8.1pp（z−1.24），为最弱之一</strong>（环节内因 β 基准缺口不可测，见口径说明）。⇒ 前三次背离还可解释为「价格在等基本面」；<strong>本期基本面已完全兑现而价格不认</strong>——分歧性质是「<strong>预期是否打满</strong>」。<strong>⚠ 本期无法判定谁对</strong>，等价格给出方向。</div><div class="callout blue"><b>④ 数据中心「社会许可」首次成为独立风险因子——从电力约束升级为执行风险</b><br>花旗 AI 基建峰会（10-09）与电力追踪（10-05）共同指向：<strong>执行风险已从「供应链 / 电力短缺」转向「社会许可（social license）」</strong>——<strong>自 2026-01 起超 400 个美国社区实施限制或暂停令</strong>；<strong>德州州长暂停新数据中心许可</strong>；NBC 民调显示 <strong>64% 选民不太可能支持支持本地数据中心的候选人</strong>；PJM 宣布「自带容量」（BYOC）政策致 <strong>2027 年容量预测下调 5GW</strong>、ERCOT 下调 1GW。<br>花旗另指出：开发商转向<strong>棕地（brownfield）</strong>压缩许可时间，<strong>土地溢价由 $300K–500K/MW 升至 $2–3M/MW</strong>；新云通过 GPU 虚拟化把利用率从 <strong>20–40% 提升至 60–90%</strong>。<strong>先进核能瓶颈在燃料供应链而非反应堆</strong>——俄供浓缩铀占全球 44%（对美禁运）、美国内产能仅 7%。<br>⇒ <strong>社会许可与燃料安全成为未来 5–10 年核心制约</strong>，直接压制 L5 数据中心与 L7 电力的「确定性溢价」——解释了本期这两条腿价格端的疲弱。</div><div class="callout red"><b>⑤ 方法提醒：环节间 5 日腿噪音大，⚡ 翻转须与 20/40 日并读</b><br>本期出现两条 ⚡信号但<strong>均未延续</strong>：W43 新立的 <strong>L3 设备 5日 ⚡（+6.36pp）本期反转 −5.5pp</strong>；<strong>L9 核能 20日由正 ⚡转负 −10.4pp</strong>。同时 <strong>L5 数据中心 5日 +8.8pp（z+2.19⚡）但 20/40 日仍为负</strong>。<br>⇒ <strong>5 日腿对单周扰动敏感（噪音大）</strong>，单看 5 日 ⚡ 容易追高——本期 L3/L4 的教训说明 <strong>⚡ 翻转须与 20/40 日方向一致时才可采信</strong>。这与 v3.28「第一指标 = 环节间」不矛盾：<strong>第一指标是「环节间」，但环节间内部也分 5/20/40 日三个口径，其中 5 日最噪</strong>。<br>另：⚠ <strong>本期 ETF 持仓未刷新</strong>（FMP holdings 端点全 404、EODHD 路径 90 天闸门），<strong>z 基于约 40–45 天前的持仓</strong>——对宽基 ETF（SMH/SOXX/IGV/SKYY）影响小，对成分变动快的环节须留意。</div></div>
+</div><div class="section"><div class="section-header"><h2>组合倾斜建议（周度读数 · 已综合 NMA · 未经稳定信号过滤）</h2><div class="section-line"></div></div>
+<table class="tbl">
+<thead><tr><th>方向</th><th>环节</th><th>依据（双轴）</th><th>NMA 量级</th><th>备注</th></tr></thead>
+<tbody>
+<tr><td><span class="tag tag-grn">超配</span></td><td>网络安全</td><td>环节内 <b>−0.03→+0.55↑</b> · 环节间 <b>20日 +26.0pp (z+1.84) ⚡</b> · 40日 +21.1pp ⚡ · 事件：大摩上调 Okta $245 · VAR 电话会 · AI 驱动 Q3 加速</td><td>中高</td><td><b>本期最强腿</b>——四层证据同向（环内+环间+机构+电话会），T2→T1</td></tr>
+<tr><td><span class="tag tag-grn">超配</span></td><td>应用/软件</td><td>环节内 +0.05→ · 环节间 <b>20日 +9.6pp (z+1.06)</b> · 40日 +7.1pp · 单名 ZS +2.82🔴 · 事件：软件增长图谱</td><td>中</td><td><b>板块整体跑赢、内部无分化</b>（v3.28 主次对调的标准形状）</td></tr>
+<tr><td><span class="tag tag-gray">观察</span></td><td>L4 网络/光模块</td><td>环节内 <b>−0.91→+0.76↑（CSCO +1.76🔴）</b> · 环节间 <b>动能衰减</b>（20日 +2.5pp z−0.28）· 事件：FCC 3.2T 利好 Lumentum/Coherent</td><td>中</td><td>环内翻红但环间未延续 W43 的 ⚡——<b>两腿不一致，降为滚动观察</b></td></tr>
+<tr><td><span class="tag tag-gray">观察</span></td><td>L3 半导体设备</td><td>环节内 −0.19→ · 环节间 <b>5日 ⚡反转 −5.5pp (z−1.45)</b> · 事件：美光利好日设备股</td><td>中</td><td><b>W43 新立后第二期即 ⚡反转</b>——5 日腿噪音的实例</td></tr>
+<tr><td><span class="tag tag-gray">观察</span></td><td>L1 ASIC/推理</td><td>环节内 <b>+0.73↑</b> · 环节间 20日 +10.6pp (z+0.59)</td><td>中</td><td>两腿偏强，次强腿</td></tr>
+<tr><td><span class="tag tag-gray">观察</span></td><td>L1 GPU/算力</td><td>环节内 −0.63↓ · 环节间 <b>5日 −6.4pp (z−1.52) ⚡</b> · 但事件端供给紧（GPU 租价涨）</td><td>中高</td><td><b>供给紧（租价）vs 需求疑（OpenAI 营收）</b>——两个口径分开写</td></tr>
+<tr><td><span class="tag tag-gray">观察</span></td><td>L6 Hyperscaler</td><td>环节内 +0.70↑ · 环节间 20日 −1.0pp · 事件：⚠ OpenAI 营收预警 → Oracle −5%</td><td>中低</td><td>环内强、环间中性；「内部循环」风险显性化</td></tr>
+<tr><td><span class="tag tag-gray">观察</span></td><td>L5 数据中心</td><td>环节内 −0.19→+0.59↑ · 环节间 <b>5日 +8.8pp (z+2.19) ⚡</b> 但 20日 −5.4pp · 事件：社会许可（400+ 社区）</td><td>中</td><td>5 日 ⚡反弹但中期仍弱；社会许可为新增压制</td></tr>
+<tr><td><span class="tag tag-gray">观察</span><br><span style="font-size:.78em">不新增</span></td><td>L2 存储/HBM</td><td>环间 <b>20日 −8.1pp (z−1.24)</b> · 事件：<b>美光电话会 HBM 售罄+SCA+RPO $1,500亿</b></td><td>高（方向逆）</td><td><b>⚠ 第四次背离</b>——基本面最硬而环间最弱；<b>本期不新增</b>，等价格给方向</td></tr>
+<tr><td><span class="tag tag-red">低配</span></td><td>L7 电力/散热</td><td>环节内 <b>+0.63→−0.28↓（🔴ETN 🟡VRT）</b> · 环节间 20日 −3.2pp · 事件：TX 暂停许可 · 64% 民调反对</td><td>中</td><td><b>社会许可成为新压制因子</b>；由「观察」降为低配</td></tr>
+<tr><td><span class="tag tag-red">低配</span></td><td>L9 核能/铀矿</td><td>环节内 +0.60↑ · 环节间 <b>20日 −10.4pp (z−1.05) ⚡</b> · 事件：燃料链瓶颈（俄浓缩铀 44%）</td><td>低</td><td>环内翻正而环间 ⚡转负——双轴背离，可投性受燃料链约束</td></tr>
+<tr><td><span class="tag tag-red">低配</span></td><td>L6 Neocloud</td><td>环节内 −0.64↓（🟡IREN −1.84）· 环节间 <b>20日 −13.6pp / 40日 −17.8pp（最弱）</b> · 事件：花旗（利用率 60-90%）</td><td>中低</td><td><b>价格最弱 + 基本面叙事改善</b>，两腿背离持续</td></tr>
+</tbody></table>
+<div class="note"><b>⚠ 口径声明：</b>① 本表为<b>周度（模式 A）读数</b>，<b>已综合 NMA 量级判断</b>（见上表）。
+② 存储一行<b>未使用环节内 z</b>（该腿可测 1/3，不可测），结论仅来自环节间动量 + 事件层。
+③ <b>L1 第一指标 = 环节间动量</b>（v3.28，10-09 起适用），环节内 z 为第二指标。
+④ ⚠ <b>ETF 持仓本期未刷新</b>（FMP holdings 端点 404、EODHD 90 天闸门）——<b>z 基于约 40–45 天前持仓</b>。
+⑤ 稳定信号过滤器（一致性 × 多源确认 × 滞回）<b>本期已注入</b>，见下一节。</div>
+<div class="callout grn"><b>✅ 本期两步均已执行（周末模式）</b><br>
+① <b>NMA 叙事量级评估</b>——模式 A 自动触发，12 条活跃叙事线逐条评估，结论见上表与 t1「NMA 叙事量级评估」模块（新增 NL-OPENAI-001 / NL-BUILD-001 两条）；
+② <b>稳定信号注入</b>（tilt_signal.py --inject）——第六步半已执行，见下一节。</div>
+</div><!-- TILT-SIGNAL-BLOCK:START -->
+<div class="section"><div class="section-header"><h2>稳定信号 · 经一致性 × 多源确认过滤</h2><div class="section-line"></div></div>
+<div class="tab-desc" style="font-size:.8rem;color:var(--text-muted);margin-bottom:12px">上表是<strong>本周读数</strong>，本表是<strong>过滤后的状态</strong>（方法论 §十二）。三部件：<strong>A 一致性</strong>（历史方向多稳，λ=0.8 衰减）× <strong>E 多源确认</strong>（环节内 z + 环节间动量双轴同读，任一条腿明确反向则否决）× <strong>H 滞回状态机</strong>（θ_up 0.6 / θ_down 0.35，反转需新方向连续 ≥2 期）。<strong>输出的是状态方向，不是本期文本方向</strong>——两者不一致时以本表为准并标注原因。数据至 2026-10-09。</div>
+<table><thead><tr><th>环节</th><th>状态</th><th>分数</th><th>A·E</th><th>本期文本</th><th>说明</th></tr></thead><tbody>
+<tr><td><strong>L2 存储/HBM</strong></td><td><span class="tag tag-green">🟢超配</span> <span class="tag tag-yellow">观察</span></td><td><strong>0.73</strong></td><td><span style="white-space:nowrap">0.92 / 0.50</span></td><td><span style="white-space:nowrap">「观察」</span></td><td>本期文本已转中性或反向，状态未切换（滞回中）<br/>环节内 +1.39 · 环节间 -1.31</td></tr>
+<tr><td><strong>L6 Hyperscaler</strong></td><td><span class="tag tag-green">🟢超配</span> <span class="tag tag-yellow">观察</span></td><td><strong>0.54</strong></td><td><span style="white-space:nowrap">0.58 / 0.50</span></td><td><span style="white-space:nowrap">「观察」</span></td><td>本期文本已转中性或反向，状态未切换（滞回中）<br/>环节内 +0.70 · 环节间 +0.54</td></tr>
+<tr><td><strong>L5 数据中心</strong></td><td><span class="tag tag-green">🟢超配</span> <span class="tag tag-yellow">观察</span></td><td><strong>0.53</strong></td><td><span style="white-space:nowrap">0.55 / 0.50</span></td><td><span style="white-space:nowrap">「观察」</span></td><td>本期文本已转中性或反向，状态未切换（滞回中）<br/>环节内 +0.59 · 环节间 +0.62</td></tr>
+<tr><td><strong>L9 核能/铀矿</strong></td><td><span class="tag tag-red">🔴低配</span> <span class="tag tag-yellow">观察</span></td><td><strong>0.52</strong></td><td><span style="white-space:nowrap">0.94 / 0.00</span></td><td><span style="white-space:nowrap">「低配」</span></td><td>价格证据不足（E 0.00）<br/>环节内 +0.60 · 环节间 -0.32</td></tr>
+<tr><td><strong>网络安全</strong></td><td><span class="tag tag-green">🟢超配</span> <span class="tag tag-yellow">观察</span></td><td><strong>0.51</strong></td><td><span style="white-space:nowrap">0.53 / 0.50</span></td><td><span style="white-space:nowrap">「超配」</span></td><td>历史一致性不足（A 0.53）<br/>环节内 +0.55 · 环节间 +1.09</td></tr>
+</tbody></table>
+<p style="font-size:.72rem;color:var(--text-muted);margin-top:6px">分数 = 0.55×A + 0.45×E；A = 历史一致性（0–1，越高越稳），E = 价格双轴确认（0–1，越高证据越强）。过证据门后按分数排序取 top-N。</p>
+<p style="font-size:.75rem;color:var(--text-muted);margin-top:10px"><strong>稳定性</strong>：回看 14 期，直接抄周度读数共翻转 57 次，经状态机后 5 次。<strong>但须注意口径</strong>：13 个环节里只有 4 个状态机真正出手过，6 个恒为中性——相当一部分「没翻转」来自「压根没动」，不宜直接读成去噪成效。<strong>兑现检验（T4）未做，「稳定 ≠ 正确」尚未回答。</strong></p>
+</div>
+<!-- TILT-SIGNAL-BLOCK:END -->
+</div>
+
+  <div class="tab-content" id="t2"><div class="tab-title">L1 行情层</div>
+    <div class="tab-desc">四步递进：环节间动量 → 板块内分化 → 子主题相关 → 个股背离，另附环节因子模型。
+    β 剥离修正后真实数据。数据至 2026-10-09。每张表下方附读法（完整算法见流程手册）。</div>
+    <div class="section"><div class="section-header"><h2>NMA 叙事量级评估 ⭐（周末模式自动触发 · v0.4.2 五层）</h2><div class="section-line"></div></div>
+<table class="tbl">
+<thead><tr><th>叙事线</th><th>量级</th><th>E2 硬数据锚点</th><th>生命周期</th><th>判断</th></tr></thead>
+<tbody>
+<tr><td><b>NL-SEC-001</b> 网络安全独立强势</td><td><b>中高（升级）</b></td><td>环节间 <b>+26.0pp (z+1.84) ⚡</b> · 40日 +21.1pp (z+1.09) ⚡ · 环节内 −0.03→<b>+0.55</b> · <b>大摩上调 Okta $245</b> · VAR 电话会三要点 · <b>AI 驱动 Q3 加速</b></td><td><b>growth_early → growth_mid</b></td><td><b>本期最强、四层证据同向</b>（环内+环间+机构+电话会），T2→T1</td></tr>
+<tr><td><b>NL-OPENAI-001</b> 终端商业化兑现</td><td><b>中（新 · 待核证）</b></td><td>⚠ <b>OpenAI 营收与市场预期相差 $200 亿</b>（10-08）· 甲骨文 −5% / 应用光电 −10% / 芯片指数 −3% · 博通拟为 OpenAI 筹 <b>$300 亿债</b> · TickerTrends 追踪 OpenAI 收入 <b>$50B</b></td><td><b>detected</b></td><td><b>终端商业化的首次直接证伪</b>（此前证据多在价格/采用率层）；⚠ <b>单源</b>，量级待核证</td></tr>
+<tr><td><b>NL-BUILD-001</b> 自建算力 / GPU 租赁</td><td><b>中（新）</b></td><td>⭐ <b>GPU 租价全面上调</b>（Nebius 10/1 新价，B300 逼近 <b>$10/GPU-hr</b>）· 花旗：neocloud 虚拟化利用率 20-40%→<b>60-90%</b></td><td><b>detected</b></td><td><b>对「减速论」的硬反证</b>——若需求撤回，租价应先行回落；支撑速度 B（build 侧）</td></tr>
+<tr><td><b>NL-HBM-001</b> 存储周期位置</td><td>高（方向逆）</td><td><b>美光 FY26Q4 电话会</b>：$542亿(+31% QoQ)、毛利率 82.3%、<b>HBM 2027 售罄+涨价</b>、26 项 SCA / RPO <b>$1,500亿</b>、2027-28 更紧、12/9 起回购 ｜ 价格：环间 <b>−8.1pp（最弱之一）</b></td><td>growth_mid（晚期）</td><td><b>第四次背离</b>——基本面达最硬形态而环间最弱；分歧性质是「预期是否打满」。<b>本期不新增</b></td></tr>
+<tr><td><b>NL-APP-001</b> 硬件→软件轮动</td><td>中</td><td>环节间 <b>20日 +9.6pp (z+1.06)</b> · 40日 +7.1pp · 环节内 +0.05 · 单名 ZS +2.82🔴</td><td>growth_early → growth_mid</td><td><b>板块整体跑赢、内部无分化</b>（v3.28 标准形状）；较 W43「两腿回落」回升</td></tr>
+<tr><td><b>NL-EQUIP-001</b> 设备端景气</td><td>中（下调）</td><td>环节间 <b>5日 ⚡反转 −5.5pp (z−1.45)</b> · 20日 +1.2pp · 环节内 −0.19→</td><td>detected → 待判</td><td><b>新立后第二期即 ⚡反转</b>——5 日腿噪音实例，降级观察</td></tr>
+<tr><td><b>NL-NET-001</b> 光互联</td><td>中（下调）</td><td>环节内 −0.91→<b>+0.76</b>（CSCO +1.76🔴）· 环节间 20日 <b>+2.5pp（动能衰减）</b> · FCC 3.2T 利好 Lumentum/Coherent</td><td>growth_early → 待判</td><td>环内翻红但环间未延续 W43 的 ⚡——<b>两腿不一致</b></td></tr>
+<tr><td><b>NL-POWER-001</b> 电力散热瓶颈</td><td>中低（下调）</td><td>环节内 +0.63→<b>−0.28</b>（🔴ETN 🟡VRT）· 环间 20日 −3.2pp · <b>TX 暂停许可 · 64% 民调反对 · PJM 下调 5GW</b></td><td>growth_early → 回吐</td><td><b>社会许可成为新压制因子</b>（本期新增维度）</td></tr>
+<tr><td><b>NL-GPU-FIN-001</b> 算力芯片融资</td><td>中</td><td>环节内 −0.63↓ · 环间 <b>5日 −6.4pp (z−1.52) ⚡</b> · 事件端供给紧（GPU 租价涨）</td><td>growth_mid</td><td><b>供给紧（租价）vs 需求疑（OpenAI 营收）</b>并存——两个口径分开读</td></tr>
+<tr><td><b>NL-HYPER-001 / NL-DC-001 / NL-NEOCLD-001</b></td><td>中低</td><td>Hyperscaler：环内 +0.70↑ / 环间 20日 −1.0pp · DC：环内 +0.59↑ / 环间 5日 +8.8pp⚡ 但 20日 −5.4pp · Neocloud：环间 −13.6pp（最弱）</td><td>各见演化表</td><td>Hyperscaler「内部循环」因 OpenAI 预警显性化；DC 社会许可；Neocloud 价格最弱但基本面改善</td></tr>
+</tbody></table>
+<div class="note"><b>本期 NMA 结论</b>：量级最高的是 <b>NL-SEC-001（网络安全）</b>——四层证据同向（环内+环间+机构+电话会），环间 20日 <b>+26pp 为全场第一</b>，是本期唯一「两腿同向且获多源确认」的叙事。<b>本期新增两条</b>：<b>NL-OPENAI-001</b>（终端商业化首次直接证伪 · 单源待核证）与 <b>NL-BUILD-001</b>（GPU 租价上调 · 减速论硬反证）——两者方向相反，正是 <b>速度 A（承压）与速度 B（强劲）分离</b>的直接映射。<b>NL-HBM-001 维持高量级但方向逆</b>（第四次背离，基本面最硬 / 环间最弱）。<b>NL-EQUIP-001 / NL-NET-001 / NL-POWER-001 三者下调</b>：设备是 ⚡反转、网络是两腿不一致、电力是价格回吐 + 新增社会许可压制。⚠ <b>本期 NMA 最该守住的一条纪律</b>：<b>把「价格回吐」与「叙事降级」分开</b>——电力属前者（基本面证据未消失）、设备属「5 日腿噪音」、网络属「两腿未共振」。</div>
+</div><div class="section"><div class="section-header"><h2>〇 环节间相对动量（L1 首表 · 代理 = YAML primary 等权 · 数据至 2026-10-09）</h2><div class="section-line"></div></div>
+<table class="tbl">
+<thead><tr><th>环节</th><th class="num">5日 pp</th><th class="num">z</th><th class="num">20日 pp</th><th class="num">z</th><th class="num">40日 pp</th><th class="num">z</th><th>翻转</th></tr></thead>
+<tbody>
+<tr><td>网络安全</td><td class="num up">+7.7</td><td class="num up">+1.24</td><td class="num up">+26.0</td><td class="num up">+1.84</td><td class="num up">+21.1</td><td class="num up">+1.09</td><td>⚡</td></tr>
+<tr><td>L1 ASIC/推理</td><td class="num dn">-1.4</td><td class="num dn">-0.41</td><td class="num up">+10.6</td><td class="num up">+0.59</td><td class="num up">+2.6</td><td class="num dn">-0.14</td><td></td></tr>
+<tr><td>应用/软件</td><td class="num up">+4.7</td><td class="num up">+0.89</td><td class="num up">+9.6</td><td class="num up">+1.06</td><td class="num up">+7.1</td><td class="num up">+0.66</td><td></td></tr>
+<tr><td>L4 网络/光模块</td><td class="num dn">-0.6</td><td class="num dn">-0.36</td><td class="num up">+2.5</td><td class="num dn">-0.28</td><td class="num up">+1.6</td><td class="num dn">-0.67</td><td></td></tr>
+<tr><td>L3 半导体设备</td><td class="num dn">-5.5</td><td class="num dn">-1.45</td><td class="num up">+1.2</td><td class="num up">+0.00</td><td class="num dn">-2.7</td><td class="num dn">-0.46</td><td>⚡</td></tr>
+<tr><td>L1 GPU/算力</td><td class="num dn">-6.4</td><td class="num dn">-1.52</td><td class="num dn">-0.4</td><td class="num dn">-0.29</td><td class="num up">+6.6</td><td class="num up">+0.09</td><td>⚡</td></tr>
+<tr><td>L6 Hyperscaler</td><td class="num up">+2.8</td><td class="num up">+0.79</td><td class="num dn">-1.0</td><td class="num up">+0.18</td><td class="num up">+0.6</td><td class="num up">+0.54</td><td></td></tr>
+<tr><td>L7 电力/散热</td><td class="num dn">-1.0</td><td class="num dn">-0.40</td><td class="num dn">-3.2</td><td class="num dn">-0.82</td><td class="num dn">-2.3</td><td class="num dn">-0.72</td><td></td></tr>
+<tr><td>L2 存储/HBM</td><td class="num dn">-6.0</td><td class="num dn">-1.07</td><td class="num dn">-8.1</td><td class="num dn">-1.24</td><td class="num dn">-4.5</td><td class="num dn">-1.31</td><td></td></tr>
+<tr><td>L5 数据中心</td><td class="num up">+8.8</td><td class="num up">+2.19</td><td class="num dn">-5.4</td><td class="num dn">-0.10</td><td class="num dn">-3.2</td><td class="num up">+0.62</td><td>⚡</td></tr>
+<tr><td>L8 电网/公用事业</td><td class="num up">+1.6</td><td class="num up">+0.52</td><td class="num dn">-7.8</td><td class="num dn">-0.50</td><td class="num dn">-8.4</td><td class="num dn">-0.11</td><td></td></tr>
+<tr><td>L9 核能/铀矿</td><td class="num up">+4.7</td><td class="num up">+1.16</td><td class="num dn">-10.4</td><td class="num dn">-1.05</td><td class="num dn">-8.3</td><td class="num dn">-0.32</td><td>⚡</td></tr>
+<tr><td>L6 Neocloud</td><td class="num dn">-9.0</td><td class="num dn">-1.06</td><td class="num dn">-13.6</td><td class="num dn">-0.91</td><td class="num dn">-17.8</td><td class="num dn">-0.87</td><td>⚡</td></tr>
+</tbody></table>
+<div class="note"><b>💡 本表读法（第〇类 · 环节间动量）：</b>代理 = 各环节 YAML <code>primary</code> 等权，相对「全体环节等权指数」的相对收益（pp）与历史 z。<b>⚡ = 5 日相对趋势翻转。</b><br>⭐ <b>本期 L1 第一指标（v3.28）的读法：</b><b>网络安全 20日 +26.0pp(z+1.84)⚡ 为全场第一</b>，且 40 日同向（+21.1pp）——<u>三个口径共振</u>，是本期唯一「多口径一致 + 获机构确认」的强腿。另一端 <b>Neocloud −13.6pp（最弱）</b>、核能 20日 −10.4pp（⚡转负）、存储 −8.1pp。<b>⚠ 本期两条 ⚡信号均未延续</b>：W43 的 L4 网络（+8.17）本期回落至 +2.5、L1 GPU 5日 −6.4pp⚡ 但 40 日仍 +6.6——<b>5 日腿噪音大，⚡ 须与 20/40 日并读</b>。</div>
+</div><div class="section"><div class="section-header"><h2>一 环节 z-score 矩阵（板块内分化）</h2><div class="section-line"></div></div>
+<table class="tbl">
+<thead><tr><th>环节</th><th class="num">成分</th><th class="num">可测</th><th class="num">z 均值</th><th class="num">z 范围</th><th>方向</th><th>信号</th></tr></thead>
+<tbody>
+<tr><td>L1 GPU/算力</td><td>4/4</td><td>4</td><td>−0.63</td><td>[−1.8,+0.7]</td><td>↓</td><td>—</td></tr>
+<tr><td>L1 ASIC/推理</td><td>5/5</td><td>5</td><td>+0.73</td><td>[−0.6,+1.9]</td><td>↑</td><td>—</td></tr>
+<tr><td>L2 存储/HBM</td><td>3/3</td><td>1</td><td>+1.39</td><td>[+1.2,+1.5]</td><td>? 不可测</td><td>—</td></tr>
+<tr><td>L3 半导体设备</td><td>7/7</td><td>7</td><td>−0.19</td><td>[−1.9,+1.1]</td><td>→</td><td>—</td></tr>
+<tr><td>L4 网络/光模块</td><td>5/5</td><td>5</td><td>+0.76</td><td>[−1.8,+1.8]</td><td>↑</td><td>🔴1 🟡0</td></tr>
+<tr><td>L5 数据中心</td><td>5/5</td><td>5</td><td>+0.59</td><td>[−1.2,+2.3]</td><td>↑</td><td>—</td></tr>
+<tr><td>L7 电力/散热</td><td>5/5</td><td>5</td><td>−0.28</td><td>[−1.7,+1.4]</td><td>→</td><td>🔴1 🟡2</td></tr>
+<tr><td>L8 电网/公用事业</td><td>4/4</td><td>4</td><td>+0.52</td><td>[−0.5,+1.0]</td><td>↑</td><td>—</td></tr>
+<tr><td>L9 核能/铀矿</td><td>3/3</td><td>3</td><td>+0.60</td><td>[−0.6,+1.7]</td><td>↑</td><td>—</td></tr>
+<tr><td>L6 Hyperscaler</td><td>3/3</td><td>3</td><td>+0.70</td><td>[−0.3,+1.9]</td><td>↑</td><td>—</td></tr>
+<tr><td>L6 Neocloud</td><td>4/4</td><td>4</td><td>−0.64</td><td>[−1.8,+0.2]</td><td>↓</td><td>🔴0 🟡1</td></tr>
+<tr><td>应用/软件</td><td>15/13</td><td>13</td><td>+0.05</td><td>[−1.8,+2.8]</td><td>→</td><td>🔴1 🟡0</td></tr>
+<tr><td>网络安全</td><td>5/5</td><td>5</td><td>+0.55</td><td>[−1.3,+2.2]</td><td>↑</td><td>—</td></tr>
+<tr><td>前沿模型代理</td><td>0/0</td><td>0</td><td>N/A</td><td>[—]</td><td>—</td><td>—</td></tr>
+</tbody></table>
+<div class="note"><b>💡 本表读法（第一类 · 板块内分化）：</b>z 度量「个股相对本环节 ETF」的横截面强弱（β 剥离 + HV 标准化），正 = 跑赢板块。
+板块整体齐涨时 z≈0 属正常（普涨），不代表板块没行情——这正是必须与上表同读的原因。<br>
+<b>⚠ 本期新增口径：</b>存储一行标为 <b>? 不可测</b> 而非「→ 方向不明」。原因：SNDK/WDC 不在基准 ETF（SMH/SOXX/FTXL/AIVC）前二十大持仓内，
+拿不到截面 z，环节内 z 仅由 MU 单点代表（可测 1/3），不足以代表环节方向。**「没测到」不等于「没方向」**，
+故不再与其他 4 个真正的 flat 环节混列。该环节结论一律以环节间动量腿 + 事件层为准。</div>
+<div class="callout"><b>本期口径修正（同日落地 · 流程手册 v3.23）</b><br>
+此前该环节因 <code>z_mean=−0.08</code> 落入 flat 阈值被判为「方向不明」并并入中性组，
+而同期环节间腿读到 −1.59 且 ⚡翻转——两者相差一个量级且方向相反。本次已将「覆盖度」与「方向」解耦，
+新增 <code>COVERAGE_MIN_RATIO=0.5</code> 判定，可测占比低于此值且成分 ≥2 时判为 <code>thin</code>；
+keyword-hints 亦新增「覆盖不足环节 · 强制补查」段，防止 L1 的覆盖缺口传导成 L2 的搜索缺口。
+其余 13 个环节读数在改动前后逐字节一致。</div>
+</div><div class="section"><div class="section-header"><h2>二 个股背离信号（累计制）</h2><div class="section-line"></div></div>
+<table class="tbl">
+<thead><tr><th>环节</th><th>标的</th><th class="num">z</th><th>方向</th><th>所属 ETF</th><th>信号类型</th></tr></thead>
+<tbody>
+<tr><td>L4 网络/光模块</td><td>CSCO</td><td class="num up">+1.76</td><td class="up">↑</td><td>TRFK</td><td><span class="tag tag-red">累计强信号</span></td></tr>
+<tr><td>L7 电力/散热</td><td>ETN</td><td class="num dn">−0.97</td><td class="dn">↓</td><td>VOLT</td><td><span class="tag tag-red">累计强信号</span></td></tr>
+<tr><td>L7 电力/散热</td><td>VRT</td><td class="num dn">−1.68</td><td class="dn">↓</td><td>VOLT</td><td><span class="tag tag-yel">累计弱信号</span></td></tr>
+<tr><td>L7 电力/散热</td><td>ETN</td><td class="num dn">−0.27</td><td class="dn">↓</td><td>GRID</td><td><span class="tag tag-yel">累计弱信号</span></td></tr>
+<tr><td>L6 Neocloud</td><td>IREN</td><td class="num dn">−1.84</td><td class="dn">↓</td><td>__SYN__</td><td><span class="tag tag-yel">累计弱信号</span></td></tr>
+<tr><td>应用/软件</td><td>ZS</td><td class="num up">+2.82</td><td class="up">↑</td><td>CLOU</td><td><span class="tag tag-red">极端单段</span></td></tr>
+</tbody></table>
+<div class="note"><b>💡 本表读法（第三类 · 个股相对 ETF 背离）：</b>累计制判定——极端单段（单段 |z|&gt;2.3）、累计强信号（连续 2 段同向且 |z₁|+|z₂|≥3.0）、累计弱信号（≥2.5）。<b>本期要点：</b>① <b>电力/散热三处同向给负</b>（ETN·VOLT z−0.97 累计强、VRT·VOLT z−1.68 累计弱、ETN·GRID z−0.27）——与电力环节内 −0.28、以及 TX 暂停许可/民调反对一致；② <b>CSCO z+1.76（TRFK）累计强</b>——网络环节内翻红（+0.76）的单点证据；③ <b>ZS z+2.82 极端单段</b>（应用软件，与环节间 +9.6pp 呼应）；④ Neocloud IREN z−1.84 累计弱。⚠ 极端单段仍是<b>单点驱动</b>，样本窄。</div>
+</div><div class="section"><div class="section-header"><h2>三 子主题背离（双数据源：因子模型 vs 原 primary 等权）</h2><div class="section-line"></div></div>
+<table class="tbl">
+<thead><tr><th>配对</th><th class="num">r（因子）</th><th class="num">z（因子）</th><th class="num">r（原 primary）</th><th class="num">z（原）</th><th>状态</th></tr></thead>
+<tbody>
+<tr><td>L1_算力芯片 ↔ L2_存储内存</td><td class="num">0.98</td><td class="num">−0.57</td><td class="num">0.45</td><td class="num">−0.15</td><td><span class="tag tag-gry">⚠ 双源差异</span></td></tr>
+<tr><td>L1_算力芯片 ↔ L3_设备EDA</td><td class="num">0.96</td><td class="num">+0.18</td><td class="num">0.83</td><td class="num">+1.09</td><td><span class="tag tag-grn">✓ 一致</span></td></tr>
+<tr><td>L1_算力芯片 ↔ L4_网络互联</td><td class="num">0.96</td><td class="num">−0.98</td><td class="num">0.84</td><td class="num">+1.11</td><td><span class="tag tag-yel">△ 方向相反</span></td></tr>
+<tr><td>L1_算力芯片 ↔ L6_云平台</td><td class="num">0.54</td><td class="num">−2.33</td><td class="num">0.34</td><td class="num">−3.70</td><td><span class="tag tag-yel">🟡 背离 (z&lt;−2)</span></td></tr>
+<tr><td>L1_算力芯片 ↔ 应用软件</td><td class="num">0.22</td><td class="num">+0.96</td><td class="num">−0.14</td><td class="num">−1.29</td><td><span class="tag tag-yel">△ 方向相反</span></td></tr>
+<tr><td>L2_存储内存 ↔ L6_云平台</td><td class="num">0.66</td><td class="num">−2.33</td><td class="num">0.52</td><td class="num">+0.07</td><td><span class="tag tag-yel">🟡 背离 (z&lt;−2)</span></td></tr>
+<tr><td>L3_设备EDA ↔ L6_云平台</td><td class="num">0.33</td><td class="num">−1.51</td><td class="num">0.42</td><td class="num">−0.27</td><td><span class="tag tag-gry">⚠ 双源差异</span></td></tr>
+<tr><td>L4_网络互联 ↔ L6_云平台</td><td class="num">0.69</td><td class="num">−2.34</td><td class="num">0.34</td><td class="num">−0.47</td><td><span class="tag tag-yel">🟡 背离 (z&lt;−2)</span></td></tr>
+<tr><td>L5_数据中心 ↔ L6_云平台</td><td class="num">0.43</td><td class="num">−2.65</td><td class="num">0.04</td><td class="num">−2.82</td><td><span class="tag tag-yel">🟡 背离 (z&lt;−2)</span></td></tr>
+<tr><td>L6_云平台 ↔ 应用软件</td><td class="num">0.87</td><td class="num">+1.48</td><td class="num">0.37</td><td class="num">−0.14</td><td><span class="tag tag-gry">⚠ 双源差异</span></td></tr>
+<tr><td>L7_电力散热 ↔ L6_云平台</td><td class="num">0.51</td><td class="num">−0.23</td><td class="num">0.62</td><td class="num">+0.26</td><td><span class="tag tag-gry">⚠ 双源差异</span></td></tr>
+<tr><td>L8_电网公用 ↔ L6_云平台</td><td class="num">0.44</td><td class="num">+0.12</td><td class="num">0.00</td><td class="num">+0.25</td><td><span class="tag tag-gry">⚠ 双源差异</span></td></tr>
+<tr><td>L9_核能铀矿 ↔ L6_云平台</td><td class="num">0.36</td><td class="num">−2.47</td><td class="num">0.47</td><td class="num">−1.86</td><td><span class="tag tag-yel">🟡 背离 (z&lt;−2)</span></td></tr>
+</tbody></table>
+<div class="note"><b>💡 本表读法：</b>同一组配对用两套口径各算一次（因子模型 vs 原 primary 等权），<b>一致 = 两源同向；方向相反 = 口径本身在分歧</b>。<br><b>本期要点：</b>① <b>13 对里 5 对「背离（z&lt;−2）」</b>——L1↔L6（−2.33）、L2↔L6（−2.33）、L4↔L6（−2.34）、L5↔L6（−2.65）、L9↔L6（−2.47）——<b>全部以 L6 云平台为一端</b>，说明本期「云平台 vs 上游各环节」的相关性普遍偏弱，是「内部循环」叙事的量化体现；② <b>L1↔L3 仍「一致」</b>；③ <b>L1↔L4 方向相反</b>（因子 −0.98 vs 原 +1.11）——两套口径对网络与算力联动判断不一致。</div>
+</div><div class="section"><div class="section-header"><h2>四 环节因子模型读数（板块绝对收益 · 46 只 ETF / 32 周 / 回构一致性 0.91）</h2><div class="section-line"></div></div>
+<table class="tbl">
+<thead><tr><th>层</th><th class="num">最新周</th><th class="num">4 周均</th><th class="num">8 周均</th><th class="num">全期累计</th><th class="num">年化</th></tr></thead>
+<tbody>
+<tr><td>L1 算力芯片</td><td>−5.11%</td><td>+2.42%</td><td>+0.42%</td><td>+77.6%</td><td>+147.2%</td></tr>
+<tr><td>L2 存储内存</td><td>−2.13%</td><td>+1.56%</td><td>+0.46%</td><td>+64.1%</td><td>+118.3%</td></tr>
+<tr><td>L3 设备 EDA</td><td>−4.35%</td><td>+1.27%</td><td>+0.08%</td><td>+33.0%</td><td>+56.8%</td></tr>
+<tr><td>L4 网络互联</td><td>−0.78%</td><td>+1.03%</td><td>+0.00%</td><td>+33.6%</td><td>+57.9%</td></tr>
+<tr><td>L5 数据中心</td><td>+2.73%</td><td>−0.23%</td><td>−0.62%</td><td>+2.6%</td><td>+4.1%</td></tr>
+<tr><td>L6 云平台</td><td>+1.68%</td><td>+1.46%</td><td>+0.45%</td><td>+40.7%</td><td>+71.3%</td></tr>
+<tr><td>L7 电力散热</td><td>−0.27%</td><td>+0.06%</td><td>−0.36%</td><td>+6.5%</td><td>+10.5%</td></tr>
+<tr><td>L8 电网公用</td><td>+0.39%</td><td>−0.10%</td><td>−0.31%</td><td>−0.9%</td><td>−1.4%</td></tr>
+<tr><td>L9 核能铀矿</td><td>−2.06%</td><td>−3.11%</td><td>−2.18%</td><td>−34.6%</td><td>−48.7%</td></tr>
+</tbody></table>
+<div class="note"><b>💡 本表读法（第四类 · 板块绝对收益）：</b>M1v2 收入口径暴露矩阵 + 截面回归推导的环节因子收益（回构一致性 0.91，v3.9）。
+与环节 z 的差别是<b>它算的是板块绝对收益，不是分化</b>。<br>
+本期唯一正收益是 <b>L6 云平台 +0.18%</b>，与环节间动量表的「Hyperscaler +3.8pp」同向；
+L9 核能 −5.17% 且 4 周均 −3.36%，是趋势性最弱的一层，与环节间腿的 −7.9pp 相互印证。
+⚠ 已知局限：L1↔L2 同域内共线（0.98）被吸收，L8/L9 暴露稀疏、估计噪声大。</div>
+</div></div>
+
+  <div class="tab-content" id="t3"><div class="tab-title">L2 事件层</div>
+    <div class="tab-desc">财报日历 + Wisburg 投研/电话会/feed + Mikko + AA changelog + TickerTrends + 自主信源（群主/Talk君/美投）。
+    数据范围：2026-09-28 ~ 10-11。</div>
+    <div class="section"><div class="section-header"><h2>📊 关键财报 / 电话会与硬数据（AI 产业链验证）</h2><div class="section-line"></div></div>
+<div class="note">⭐ <b>本期财报日历为「余波期」——无新增美股 AI 巨头财报</b>（云厂 Q3 于 10 月底），但命中三条相关：<b>美光 FY26Q4 电话会（10-02·已深读）</b>· <b>台积电 9月/三季度（10-08·营收 +51% YoY）</b>· <b>鸿海 Q3（10-06·超预期）</b>。另埃森哲 FY26Q4（10-02）电话会已读。</div>
+<div class="section-note">本期硬数据（按环节）：<b>美光 FY26Q4 电话会</b>——HBM 2027 大部分产能售罄且价格大幅上涨、26 项 SCA/RPO <b>$1,500亿</b>、<b>2027-28 供需比 2026 更紧</b>、12/9 起增加资本回报；<b>台积电</b> 三季度营收同比 <b>+51%</b> 超指引上限；<b>硬件与网络行业模型（10-06）</b>——服务器 2026 <b>$5,060亿(+78%)</b>、以太网交换机 <b>$480亿(+52%)</b>、DCI +49%、AEC +121%（Credo 份额 78%）。⚠ <b>本期最重的硬数据在价格端而非财报端</b>：<b>GPU 租价全面上调</b>（Nebius 10/1，B300 逼近 $10/GPU-hr）与 <b>OpenAI 营收预警</b>同时出现。</div>
+</div><div class="section"><div class="section-header"><h2>🔴 存储：第四次背离——基本面达最硬形态，环节间仍最弱</h2><div class="section-line"></div></div>
+<div class="note"><b>美光 FY26Q4 电话会（10-02）把基本面推到本模型运行以来最硬</b>——管理层明确：<b>HBM 2027 大部分产能已售罄且价格大幅上涨</b>（缩小与传统 DRAM 的毛利差）、<b>26 项 SCA 锁定至 2030 年 35%+ 营收（RPO ~$1,500亿）</b>、<b>2027–2028 供需比 2026 紧张得多、看不到恢复平衡的时间线</b>，并将于 12/9 起增加资本回报（回购）。
+<br><b>但存储环节间仍为最弱之一</b>：20 日 <b>−8.1pp（z−1.24）</b>、40 日 −4.5pp；环节内因 β 基准缺口不可测（可测 1/3）。
+<br>⇒ <b>四次背离的演化</b>：W39「价格在等基本面」→ W41「基本面强化、价格不认」→ W43「最硬财报、价格仍不认」→ <b>本期「电话会给出 2027-28 更紧 + 回购，环间仍最弱」</b>。分歧性质是「<b>预期是否打满</b>」，而非「谁对」。<b>⚠ 本期不新增，等价格给出方向</b>。</div>
+</div><div class="section"><div class="section-header"><h2>🟢 网络安全：本期最强的轮动，两条腿首次同向</h2><div class="section-line"></div></div>
+<div class="note"><b>网络安全是本期最清晰的轮动</b>——<b>环节间 20 日 +26.0pp（z+1.84⚡）、40 日 +21.1pp（z+1.09⚡），全场第一</b>，且环节内由 W43 的 −0.03 回升至 <b>+0.55</b>，<b>两条腿首次同向</b>（W43 曾「一弱一强」）。
+<br><b>L2 三源确认</b>：<b>大摩上调 Okta 至 $245（超配）</b>、网络安全 VAR 电话会三大要点（10-09）、<b>AI 驱动 Q3 加速</b>（10-06）、AI 与国家安全政策华盛顿纪要。⇒ <b>四层证据同向</b>（环内+环间+机构+电话会），Tier 由 T2 升 T1。
+<br>⚠ <b>与此同时 W43 的两条 ⚡ 腿双双回落</b>：<b>L3 设备</b> 环间 5 日 ⚡ 反转为 <b>−5.5pp（z−1.45）</b>（新立后第二期即反转）；<b>L4 网络</b> 环间 20 日动能衰减至 +2.5pp（z−0.28），仅环节内翻红（CSCO +1.76🔴）。⇒ <b>本期教训：5 日腿噪音大，⚡ 翻转须与 20/40 日方向一致时才可采信。</b>
+<br>另：<b>算力芯片环节间 5 日 −6.4pp（z−1.52）⚡</b>，而事件端供给仍紧（GPU 租价上调）——<b>绝对（供给紧）与相对（资金分流）两个口径分离</b>。</div>
+</div><div class="section"><div class="section-header"><h2>🟠 数据中心「社会许可」+ OpenAI 营收预警：执行风险与商业化证伪</h2><div class="section-line"></div></div>
+<div class="note"><b>花旗 AI 基建峰会（10-09）与电力追踪（10-05）把「社会许可」推成独立风险因子</b>：自 2026-01 起<b>超 400 个美国社区</b>实施限制或暂停令；<b>德州州长暂停新数据中心许可</b>；NBC 民调 <b>64% 选民</b>不太可能支持支持本地数据中心的候选人；PJM「自带容量」（BYOC）致 <b>2027 容量预测下调 5GW</b>、ERCOT 下调 1GW。花旗另指：开发商转向<b>棕地</b>压缩许可，<b>土地溢价 $300K–500K/MW → $2–3M/MW</b>；新云虚拟化把利用率从 <b>20–40% 提升至 60–90%</b>；<b>先进核能瓶颈在燃料供应链</b>（俄浓缩铀占 44%、美国内仅 7%）。
+<br>⚠ <b>同时出现本期最重要的终端信号</b>：<b>OpenAI 营收与市场预期相差 $200 亿</b>（10-08）——终端商业化首次直接证伪，当日<b>甲骨文 −5%、应用光电 −10%、芯片指数 −3%、光通信重挫</b>；<b>博通拟为 OpenAI 筹 $300 亿债务融资</b>（算力扩张转向杠杆化）。
+<br>⇒ <b>两条并列登记</b>：<b>需求端「兑现受疑」（OpenAI 营收）</b> 与 <b>供给端「紧缺加剧」（GPU 租价上调 · Nebius B300 逼近 $10/hr）</b> 同时成立，正是速度 A（buy·承压）与速度 B（build·强劲）分离的直接映射。<b>⚠ OpenAI 营收一项目前为单源，需下期核证。</b></div>
+</div><div class="section"><div class="section-header"><h2>🔴 宏观：美债 10Y 拍卖强劲（中标 5.3%）· 加息路径与油价扰动</h2><div class="section-line"></div></div>
+<div class="note"><b>美联储会议纪要</b>：全体 19 名决策者支持 9 月加息，<b>「大多数」预计年内还加 1 次</b>，但暗示 10 月不急；沃勒称加息无需连续会议；点阵图反映 2027 年初加息后再降息。⇒ <b>利率路径仍是压制估值分母端的变量</b>。
+<br><b>利率端出现对冲信号</b>：<b>10Y 美债拍卖需求极强</b>——中标收益率 <b>5.3%</b>、投标倍数 <b>2.77</b>（近 12 次最高）、一级交易商承接比例仅 <b>2.5%</b>（历史最低）——<b>终端资金在高收益率上配置意愿强</b>。
+<br><b>油价与地缘</b>：中东升级（沙特机场遇袭、波斯湾油轮中弹）+ 飓风威胁墨西哥湾，<b>布油站上 102 美元</b>；花旗石油监测指物流成本飙升（VLCC 运费 20→250 美元/吨）、柴油裂解价差高企。
+<br><b>通胀</b>：高盛拆解核心 PCE 超预期——<b>约 3/4 来自一次性冲击与测量误差</b>（能源转嫁、关税、消费电子权重过高），维持 2027-12 回落至 2.2% 的预测。
+<br>⇒ <b>分母端（利率 / 加息路径）本期偏中性偏紧</b>，未出现上期「非农爆冷 → 加息定价大降」的顺风；市场结构 / 广度的恶化仍是背景风险。</div>
+</div><div class="section"><div class="section-header"><h2>🟡 其他供给端与需求端要点</h2><div class="section-line"></div></div>
+<div class="section-note">
+<b>· 供给端（AA changelog · 反证放缓论）</b>：模型发布节奏仍密——<b>Claude Haiku 5.5（10-07）、Mistral Large 4（10-06）、Gemini 4 Argon（09-30·谷歌重回前三）、GPT-6.1 Sol（09-29·7 天即换代）、Claude Sonnet 5.5（09-28）、Grok 4.7（09-21）</b>；Methodology 升至 v4.3.2。⇒ <b>模型厂并未放慢发布</b>。
+<b>· 网络/光模块</b>：<b>FCC 拟限制 3.2T 光模块</b>（10-05/10-09）利好 Lumentum/Coherent；硬件网络模型上调（以太网交换机 CAGR 36%、<b>Arista 2025 份额 22% 超 Cisco 18%</b>）；HPE 网络投资者日上调 F2027 展望。
+<b>· 数据中心</b>：Dell'Oro 数据中心前景（10-08）；亚太数据中心瓶颈与缓解路径（10-11）；AI 数据中心电源市场（新型 GPU 供电网络 + 被动元件需求）。
+<b>· 中国</b>：巴克莱「AI 成中国增长新支柱、出口驱动」——2026 贡献 GDP <b>0.8pp</b>（其中出口 0.5pp）、AI 相关出口 <b>+52%</b>；但 <b>未显著创造就业</b>（主要科技公司员工较 2022 峰值 <b>−6.6%</b>）。大摩维持亚洲科技/台韩超配（亚洲 AI 股占指数权重 &gt;50%）。
+<b>· TickerTrends（大众注意力层）</b>：OpenAI Revenue tracked at <b>$50B</b>；<b>Codex 超越 Claude Code on Reddit</b>；Figma 企业 MCP 留存降至 25%（核心平台仍 &gt;70%）；OpenAI 公开 GitHub 活动创 8 月纪录。
+<b>· 黄金（JPM/DB）</b>：JPM 认为可能先测 <b>$4,000</b> 支撑、2027 年底目标 <b>$5,000</b>；DB 主张全力做多（CTA 抛压被现货/EFP 吸收）。
+</div></div></div>
+
+  <div class="tab-content" id="t4"><div class="tab-title">利润池规模</div>
+    <div class="tab-desc">7 因子周度评估 + 双锚校准 + 历史基线 + DC 供需劈叉风险标注。口径见 t6。数据至 2026-10-09。</div>
+    <div class="section"><div class="section-header"><h2>周度驱动因子（7 因子）</h2><div class="section-line"></div></div>
+<table class="tbl">
+<thead><tr><th>驱动因子</th><th>上期</th><th>本期</th><th>变化</th><th>来源 / 依据</th></tr></thead>
+<tbody>
+<tr><td>IT 总支出增速</td><td>+3.3~4.8%</td><td>+3.3~4.8%</td><td class="fl">→</td><td>本期无新 CIO 调查（Citi 下一份约 10 月、MS 上一份 07-16、Piper 预计 12 月）</td></tr>
+<tr><td>AI 渗透率</td><td>23.8%（BTOS 09-20）</td><td>23.8%（BTOS 10-04）</td><td class="fl">转平</td><td>⚠ BTOS 202620：采用率 <b>23.8%（+0.0pp·首次转平）</b>、预期 27.7%——渗透广度出现停滞信号</td></tr>
+<tr><td>单位任务成本</td><td>Pareto 前沿 DeepSeek V4 Flash $0.027/任务</td><td>同左</td><td class="fl">→</td><td>AA 快照<b>第 11 期</b>（10-11·<b>697 模型</b>）；Pareto 前沿位置未变</td></tr>
+<tr><td>利润率</td><td>15–25%</td><td>15–25%</td><td class="fl">→</td><td>美光 FY26Q4 营业利润率 <b>82.3%</b>（存储端极高）；HBM 2027 售罄+涨价缩小与非 HBM 毛利差</td></tr>
+<tr><td>需求弹性信号</td><td>ε&gt;1</td><td>ε&gt;1</td><td class="fl">→</td><td>Ramp 日频单价持续通缩（anthropic $0.824/M）而 OpenRouter W40 付费用量 <b>+16.7%</b>（杰文斯）</td></tr>
+<tr><td>融资结构</td><td>新钱 54%</td><td>新钱 54%</td><td class="fl">→</td><td>⚠ <b>博通拟为 OpenAI 筹 $300 亿债务融资</b>——算力扩张转向杠杆化；循环融资信用集中度上升</td></tr>
+<tr style="background:rgba(201,154,90,.06)"><td><b>总池预期（2028E）</b></td><td><b>~$1,750B</b></td><td><b>~$1,750B</b></td><td class="fl">维持</td><td>分子端向上（美光电话会·硬件网络模型上调）与分母端新压制（社会许可·OpenAI 营收预警）相互抵消</td></tr>
+</tbody></table>
+<div class="note"><b>💡 本表读法：</b>利润池规模 = 最终端用户为 AI 产品与服务支付的总收入（不含 capex、不含消费设备）。
+<b>本期 7 个因子全部维持</b>——这不是「没变化」，而是<b>分子与分母在方向相反的位置上各自确认</b>：
+分子端（台积电/美光/光模块订单）继续向上修正，分母端（FOMC +25bp、点阵 2027 不降息）确认抬升。
+两者对利润池规模的影响相反，故总量维持，但<b>同样规模在更高折现率下的估值含义截然不同</b>——这才是本期定价的主要矛盾。</div>
+</div><div class="section"><div class="section-header"><h2>双锚校准（Ramp / BTOS → 五落点）</h2><div class="section-line"></div></div>
+<table class="tbl">
+<thead><tr><th>落点</th><th>最新读数</th><th>本期状态</th></tr></thead>
+<tbody>
+<tr><td>① 总池下界交叉验证</td><td>Ramp 人均月支出中位 $12.50（2026-08）· 日频单价 anthropic $0.824/M（09-29）</td><td class="fl">月频停 08 月；Ramp 10 月期未发</td></tr>
+<tr><td>② 钱流向哪层</td><td>API 50.8% + GPU Cloud 14.8% + 推理托管 7.3% ≈ 73% 流向模型/算力</td><td class="fl">无更新</td></tr>
+<tr><td>③ 前沿模型集中度</td><td>Ramp 日频 <b>Anthropic ~54.5% vs OpenAI ~45.5%</b>（9/29）</td><td class="up">日频推进至 09-29（月频仍 8 月）</td></tr>
+<tr><td>④ 渗透率深度</td><td>金融 $40 / 科技 $79 / 制造 $8.9；小企业 $22.8 / 大企业 $3.4</td><td class="fl">无更新</td></tr>
+<tr><td>⑤ 渗透率因子校准</td><td>BTOS 采用率 <b>23.8%</b>（<b>+0.0pp</b>，202620 期·采集 09-21~10-04）；<b>预期未来 6 个月 27.7%</b>（+0.1pp）</td><td class="fl">⚠ <b>首次转平</b>——渗透广度停滞信号（此前 +0.8/+0.6/+0.6pp）</td></tr>
+</tbody></table>
+<div class="note">⚠ <b>本期两个锚点一平一新</b>：<b>BTOS 新期 202620</b>（采集 09-21~10-04）：采用率 <b>23.8%（+0.0pp·首次转平）</b>、预期 27.7%（+0.1pp）——<b>渗透广度出现停滞信号</b>（此前 +0.8/+0.6/+0.6pp）；<b>Ramp 月频仍为 2026-08</b>（Top1% $7,205 · −9.7% MoM），<b>日频 tokenPrices 推进至 2026-09-29</b>（anthropic $0.824/M · openai $0.596/M，持续通缩）。⇒ Ramp 10 月期（装 9 月数据）官方仍未发布。⚠ <b>Ramp 取数法本期已重建</b>（旧 Datawrapper 失效，改为抽 Next.js RSC payload 内嵌数组，见流程手册 §六）。</div>
+</div><div class="section"><div class="section-header"><h2>历史基线</h2><div class="section-line"></div></div>
+<table class="tbl">
+<thead><tr><th>年份</th><th class="num">企业 IT</th><th class="num">AI 最终用户</th><th class="num">渗透率</th></tr></thead>
+<tbody>
+<tr><td>2024</td><td class="num">~$5.0T</td><td class="num">~$650B</td><td class="num">~13%</td></tr>
+<tr><td>2025</td><td class="num">~$5.4T</td><td class="num">~$780B</td><td class="num">~14.4%</td></tr>
+<tr><td><b>2026E</b></td><td class="num">~$5.6T</td><td class="num"><b>~$900–1,050B</b></td><td class="num">~16–19%</td></tr>
+<tr><td><b>2028E</b></td><td class="num">~$6.3T</td><td class="num"><b>~$1,500–2,000B</b></td><td class="num">~24–32%</td></tr>
+</tbody></table>
+<div class="note">中枢锚定 <b>~$1,750B（2028E）</b>。本期维持，无区间调整。</div>
+</div><div class="section"><div class="section-header"><h2>DC 供需劈叉风险标注</h2><div class="section-line"></div></div>
+<div class="callout blu"><b>本期 DC 风险：从「电力约束」升级为「社会许可」</b><br>
+① <b>社会许可</b>：自 2026-01 起<b>超 400 个美国社区</b>限制/暂停；<b>TX 暂停新许可</b>、NBC 民调 <b>64% 反对</b>；PJM BYOC 致 2027 容量下调 5GW、ERCOT 下调 1GW；<br>
+② <b>环节间</b>：L5 数据中心 5 日 <b>+8.8pp（z+2.19⚡）</b> 但 20/40 日仍负；L6 云平台 20 日 −1.0pp；<br>
+③ <b>子主题背离</b>：L5↔L6 因子 z=−2.65、原口径 z=−2.82（均 &lt;−2 背离）。<br>
+<b>三条同向</b>：容量供给方相对平台方走弱，且新增「社会许可」这一执行风险维度。<b>但需注意</b>：这与「容量长期短缺」不矛盾——花旗指出瓶颈在棕地许可、电力互联与先进核能燃料（俄浓缩铀 44%），而非容量过剩；价格端走弱更可能反映久期与融资结构差异。参考 <code>research/dc-divergence-analysis-methodology.md</code>，本期判定为 <b>预警级别，未达短缺/过剩定性阈值</b>。</div>
+</div></div>
+
+  <div class="tab-content" id="t5"><div class="tab-title">叙事时间线 + 逻辑链</div>
+    <div class="tab-desc">已有叙事线的状态演化 + 本期完整逻辑链。数据至 2026-10-09。</div>
+    <div class="section"><div class="section-header"><h2>叙事线演化表</h2><div class="section-line"></div></div>
+<table class="tbl">
+<thead><tr><th>ID</th><th>环节</th><th>一句话</th><th>首次</th><th>周数</th><th>本期状态</th><th>本期变化</th></tr></thead>
+<tbody>
+<tr><td>NL-SEC-001</td><td>网络安全</td><td>AI 安全需求独立于预算周期兑现</td><td>W41</td><td>4</td><td><b>升级 · 两腿同向</b></td><td>环节间 20日 <b>+26.0pp(z+1.84)⚡ 全场第一</b> + 环节内 +0.55；大摩上调 Okta $245 · VAR 电话会 · AI 驱动 Q3 加速 → <b>T2→T1</b></td></tr>
+<tr><td><b>NL-OPENAI-001</b></td><td>跨（终端商业化）</td><td>OpenAI 商业化兑现 vs 市场预期</td><td>W44</td><td>1</td><td><b>新</b></td><td>⚠ <b>营收与预期差 $200亿</b> → 甲骨文 −5% / 应用光电 −10% / 芯片 −3%；博通拟筹 $300亿债。⚠ 单源待核证</td></tr>
+<tr><td><b>NL-BUILD-001</b></td><td>跨（自建算力）</td><td>GPU 租价上行、折旧年限</td><td>W44</td><td>1</td><td><b>新</b></td><td>⭐ <b>GPU 租价全面上调</b>（Nebius 10/1，B300 逼近 $10/hr）——对减速论的硬反证</td></tr>
+<tr><td>NL-HBM-001</td><td>L2 存储/HBM</td><td>存储周期位置：超级周期 vs 预期打满</td><td>W35</td><td>11</td><td><b>第四次背离</b></td><td>美光电话会基本面最硬（HBM 2027 售罄+涨价·RPO $1,500亿·12/9 回购）；环间 20日 <b>−8.1pp</b>（最弱之一）；环节内不可测</td></tr>
+<tr><td>NL-APP-001</td><td>应用/软件</td><td>硬件→软件轮动</td><td>W31</td><td>14</td><td><b>环间偏强</b></td><td>环节间 20日 <b>+9.6pp(z+1.06)</b> · 40日 +7.1pp；环节内 +0.05、ZS +2.82🔴——板块跑赢、内部无分化</td></tr>
+<tr><td>NL-EQUIP-001</td><td>L3 半导体设备</td><td>设备（卖铲人）景气回补</td><td>W43</td><td>2</td><td><b>⚡反转</b></td><td>环节间 5日 ⚡由 +6.36pp 反转 <b>−5.5pp(z−1.45)</b>——新立后第二期即反转</td></tr>
+<tr><td>NL-NET-001</td><td>L4 网络/光模块</td><td>光互联需求上行</td><td>W33</td><td>12</td><td><b>两腿不一致</b></td><td>环节内 −0.91→<b>+0.76</b>（CSCO +1.76🔴）；环间动能衰减至 20日 +2.5pp；FCC 3.2T 利好 Lumentum/Coherent</td></tr>
+<tr><td>NL-POWER-001</td><td>L7 电力/散热</td><td>电力散热需求确定 vs 社会许可</td><td>W33</td><td>12</td><td><b>压制（社会许可）</b></td><td>环节内 +0.63→<b>−0.28</b>（🔴ETN 🟡VRT）；TX 暂停许可 · NBC 民调 64% 反对 · PJM 下调 5GW</td></tr>
+<tr><td>NL-GPU-FIN-001</td><td>L1 GPU/算力</td><td>GPU 融资与需求</td><td>W34</td><td>11</td><td><b>绝对/相对分离</b></td><td>环节内 −0.63↓、环间 5日 <b>−6.4pp(z−1.52)⚡</b>；但供给端紧（租价涨）——两口径分离</td></tr>
+<tr><td>NL-HYPER-001</td><td>L6 Hyperscaler</td><td>云资本开支维持高位</td><td>W31</td><td>14</td><td><b>环内强/环间中性</b></td><td>环节内 +0.70↑；环间 20日 −1.0pp；⚠ OpenAI 营收预警令「内部循环」风险显性化（Oracle −5%）</td></tr>
+<tr><td>NL-DC-001</td><td>L5 数据中心</td><td>数据中心容量供不应求 vs 社会许可</td><td>W33</td><td>12</td><td><b>5日反弹</b></td><td>环间 5日 <b>+8.8pp(z+2.19)⚡</b> 但 20/40 日仍负；花旗：棕地升温 · 土地溢价 $2-3M/MW · 400+ 社区限制</td></tr>
+<tr><td>NL-NEOCLD-001</td><td>L6 Neocloud</td><td>算力租赁经济性</td><td>W31</td><td>14</td><td><b>最弱 + 基本面改善</b></td><td>环节内 −0.64↓（🟡IREN）；环间 <b>20日 −13.6pp / 40日 −17.8pp（最弱）</b>；花旗：利用率 20-40%→60-90%</td></tr>
+</tbody></table>
+<div class="note"><b>💡 本期是「新叙事诞生 + 旧叙事再检验」并存的一期。</b><br>上表 12 条线里<b>新增 2 条</b>（NL-OPENAI-001 终端商业化兑现、NL-BUILD-001 GPU 租价上行）——两条方向相反，正是速度 A（承压）与速度 B（强劲）分离的直接映射；其余 10 条已有线中 <b>至少 4 条出现状态变化</b>（网安升级、设备 ⚡反转、电力压制、存储第四次背离）。<br>⚠ <b>需注意的新意</b>：本期两条新线的证据强度不同——NL-BUILD-001 有硬数据（Nebius 官方价目），NL-OPENAI-001 目前为<b>单源</b>（Mikko 转载），需下期核证。</div>
+</div><div class="section"><div class="section-header"><h2>逻辑链（本期）</h2><div class="section-line"></div></div>
+<div class="callout"><b>主链：终端商业化「兑现受疑」 vs 供给侧「租价反证」（本期最核心的分歧）</b><br>
+<b>① 触发</b>：10-08 <b>OpenAI 营收与市场预期相差 $200 亿</b>（Mikko 转载）——终端商业化首次直接证伪
+→ <b>② 定价</b>：AI 板块遭重创——甲骨文 −5%、应用光电 −10%、芯片指数 −3%、光通信重挫
+→ <b>③ 叠加</b>：美联储会议纪要（9 月加息 25bp，大多数预计年内还加 1 次）——分母端未获上期「非农爆冷」的顺风
+→ <b>④ 对冲</b>：⭐ GPU 租价全面上调（Nebius 10/1，B300 逼近 $10/hr）+ 博通拟为 OpenAI 筹 $300 亿债（杠杆化）——<b>供给端仍紧</b>
+→ <b>⑤ 分化</b>：环节间极差大——网络安全 +26.0pp(z+1.84)⚡ 最强 vs Neocloud −13.6pp 最弱。
+</div>
+<div class="callout blu"><b>反链：为什么「AI 见顶」的解释本期不成立</b><br>
+若需求端转弱，应看到订单/指引下修。实际相反：美光电话会 HBM 2027 售罄+涨价、硬件与网络模型上调（服务器 +78%、交换机 +52%）、台积电三季度 +51%。<b>但本期确有「兑现」层的证伪（OpenAI 营收）</b>——<b>故本期不采纳「AI 见顶」，也不采纳「一切照旧」</b>：分子端（订单/指引）仍强、兑现端（营收）首次受疑，两者并列登记。</div>
+<div class="callout"><b>待验的分叉</b><br>
+① <b>「社会许可」是长期约束还是短期噪音</b>——看 400+ 社区限制是否影响实际投运（PJM/ERCOT 已下调 2027 容量）；
+② <b>OpenAI 营收预警是否被证实</b>——单源待核证，下期若获独立源确认，则终端商业化叙事需整体降级；
+③ <b>GPU 租价上行能否延续</b>——若延续则支撑「阶段Ⅰ」，若回落则速度 B 承压。</div>
+</div></div>
+
+  <div class="tab-content" id="t6"><div class="tab-title">框架附录</div>
+    <div class="tab-desc">三层递进架构、口径定义、L1 算法要点、版本信息。</div>
+    <div class="section"><div class="section-header"><h2>三层递进</h2><div class="section-line"></div></div>
+<table class="tbl">
+<thead><tr><th>层</th><th>内容</th><th>自动化程度</th><th>本期状态</th></tr></thead>
+<tbody>
+<tr><td>L1 行情层</td><td>环节因子模型 + 环节 z（板块内分化）+ 环节间动量（跨环节轮动）+ 子主题背离 + 交叉验证</td><td>全自动</td><td><span class="tag tag-grn">已跑</span> 数据至 2026-10-09</td></tr>
+<tr><td>L2 事件层</td><td>财报日历 + Wisburg 研报/电话会/feed + Mikko 日志 + AA changelog + TickerTrends + 自主信源（群主/Talk君/美投）</td><td>半自动</td><td><span class="tag tag-grn">8 路信源全部覆盖</span></td></tr>
+<tr><td>L3 判断层</td><td>交叉判断矩阵 + 五大判断 + 叙事量级判断</td><td>人类定性</td><td><span class="tag tag-yel">本期 NMA 未执行（周中模式豁免）</span></td></tr>
+</tbody></table>
+</div><div class="section"><div class="section-header"><h2>口径定义（buy / build）</h2><div class="section-line"></div></div>
+<div class="note">
+<b>利润池规模 = 最终端用户（企业/个人）为 AI 产品和服务支付的总收入</b>，口径<b>不含 capex、不含消费设备</b>。<br>
+· <b>buy 侧（本报告锚定）</b>：企业/个人为 AI 服务支付的费用 —— API、订阅、推理托管、GPU 云租赁等（对应速度 A）。<br>
+· <b>build 侧</b>：为构建 AI 能力发生的资本开支 —— 服务器、芯片、电力、数据中心建设（对应速度 B）。<br>
+两者<b>不可相加</b>：build 是 buy 的上游投入，本期 $1,750B 的 2028E 锚定的是 buy 侧。<br>
+<b>本期特别说明</b>：台积电 +53.3%、美光超预期、光模块 1.6T 缺口 25% 均属 <b>build 侧</b>证据，
+故不能直接上调 buy 侧利润池；本期 7 因子全部维持，正是这一口径纪律的结果。
+</div>
+</div><div class="section"><div class="section-header"><h2>L1 算法要点（排查必读）</h2><div class="section-line"></div></div>
+<div class="note">
+<b>① 环节 z（板块内分化）</b>：个股收益 − β×环节 ETF 收益 → 残差 ÷ 自身历史波动率（HV）→ 截面 z-score。<br>
+<b>② 数据窗口（v0.3 反向锚定）</b>：从最新交易日往前每 5 交易日一段，<b>最新段恒为完整 5 段</b>，滚动窗 8 段。
+中期运行不会出现半截段，故周中运行与周末运行可比（同为「最近 5 个交易日」）。<br>
+<b>③ 持续性（累计制 v0.4）</b>：极端单段（|z|&gt;2.3）· 累计强信号（连续 2 段同向，|z₁|+|z₂|≥3.0 且至少一个 &gt;2.0）· 累计弱信号（≥2.5）· 缓慢脱钩（连续 3 段 |z|&gt;1.0）。<br>
+<b>④ 环节间动量（v0.3）</b>：代理 = 各环节 YAML <code>primary</code> 等权，相对「全体环节等权指数」算 5/10/20/40 日相对收益 + 历史 z。⚠ <b>W41 为口径切换点</b>，W39/W40 数值不可直接比。<br>
+<b>⑤ 覆盖度（v0.5 · 2026-09-17 新增）</b>：<code>COVERAGE_MIN_RATIO=0.5</code>。可测 primary 占比低于此值且成分 ≥2 时，
+方向判为 <code>thin</code>（不可测），<b>不与 flat（测到了、确实没方向）混列</b>。
+首个适用环节：L2 存储/HBM（可测 1/3）。完整算法见 <code>config/profit-pool-update-workflow.md</code> 与 <code>research/ai-profit-pool-methodology.md</code>。
+</div>
+</div><div class="section"><div class="section-header"><h2>版本</h2><div class="section-line"></div></div>
+<table class="tbl">
+<thead><tr><th>项目</th><th>值</th></tr></thead>
+<tbody>
+<tr><td>报告类型</td><td>模式 A · 周度（周末）</td></tr>
+<tr><td>数据至</td><td>2026-10-09</td></tr>
+<tr><td>生成日</td><td>2026-10-11</td></tr>
+<tr><td>触发原因</td><td>周度常规更新（周末模式）。本期三项核心变化：<b>① ⚠ OpenAI 营收与市场预期相差 $200 亿</b>（10-08）——终端商业化首次直接证伪，当日甲骨文 −5%、应用光电 −10%、芯片指数 −3%；<b>② ⭐ 网络安全成为最强轮动</b>——环节间 20日 +26.0pp（z+1.84⚡）全场第一、两条腿首次同向，T2→T1；<b>③ 存储第四次背离</b>——美光 FY26Q4 电话会基本面达最硬形态（HBM 2027 售罄+涨价、RPO $1,500亿、12/9 回购）而环节间仍 −8.1pp（最弱之一）</td></tr>
+<tr><td>流程手册版本</td><td>v3.27（2026-09-22：报告自检脚本化 <code>report_selfcheck.py</code> + 归档目录一期一档）</td></tr>
+<tr><td>L1 脚本版本</td><td>profit_pool_scan v0.6 · cross_sector_momentum v0.3（数据至 2026-10-09）· layer_factor_model（46 只 ETF / 33 周 / 回构一致性 0.91）</td></tr>
+<tr><td>上一期</td><td>数据至 2026-10-02（<code>AI周报LOG/ai-profit-pool-flow_20261002.html</code>）</td></tr>
+<tr><td>本期已执行步骤</td><td>NMA 叙事量级评估（周末模式自动触发·已写入 t2）· 稳定信号注入（第六步半）</td></tr>
+</tbody></table>
+</div></div>
+</div>
+<script>
+document.querySelectorAll('.tab-btn').forEach(b=>{b.addEventListener('click',()=>{document.querySelectorAll('.tab-btn').forEach(x=>x.classList.remove('active'));document.querySelectorAll('.tab-content').forEach(x=>x.classList.remove('active'));b.classList.add('active');document.getElementById(b.dataset.tab).classList.add('active');});});
+</script>
+</body></html>

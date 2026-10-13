@@ -1,0 +1,93 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>YF AI 信号周报 · 导航</title>
+<meta name="description" content="三份周度模型（CO 凸性叠加信号 / AI 利润池流向 / 基建利润流速）的在线看板索引。">
+<meta name="color-scheme" content="light">
+<meta property="og:type" content="website">
+<meta property="og:title" content="YF AI 信号周报 · 导航">
+<meta property="og:description" content="CO 凸性叠加信号 / AI 利润池流向 / 基建利润流速 —— 周度模型在线看板。">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='7' fill='%231a1a2e'/%3E%3Cpath d='M4 20 L11 20 L14 11 L18 25 L21 16 L28 16' stroke='%234ade80' stroke-width='2.4' fill='none' stroke-linejoin='round' stroke-linecap='round'/%3E%3C/svg%3E">
+<style>
+:root { color-scheme: light }
+* { margin:0; padding:0; box-sizing:border-box }
+body { font-family:-apple-system,BlinkMacSystemFont,'Segoe UI','PingFang SC','Microsoft YaHei',Arial,sans-serif;
+       background:#f8f7f4; color:#1a1a1a; line-height:1.65; -webkit-font-smoothing:antialiased }
+.wrap { max-width:920px; margin:0 auto; padding:40px 20px 24px }
+.head { background:linear-gradient(135deg,#1a1a2e 0%,#16213e 100%); color:#fff;
+        border-radius:16px; padding:34px 30px; margin-bottom:22px }
+.head h1 { font-size:24px; font-weight:700; letter-spacing:.3px }
+.head .sub { font-size:13px; opacity:.72; margin-top:6px }
+.head .meta { font-size:11px; opacity:.5; margin-top:14px }
+.card { display:block; text-decoration:none; color:inherit; background:#fff; border-radius:12px;
+        padding:20px 22px; margin-bottom:14px; box-shadow:0 1px 4px rgba(0,0,0,.05);
+        border-left:4px solid #e5e0d8; transition:transform .12s ease, box-shadow .12s ease }
+.card:hover { transform:translateY(-2px); box-shadow:0 6px 18px rgba(0,0,0,.09) }
+.card .top { display:flex; align-items:baseline; justify-content:space-between; gap:12px; flex-wrap:wrap }
+.card .t { font-size:17px; font-weight:700 }
+.card .st { font-size:12px; font-weight:600 }
+.card .sub2 { font-size:12px; color:#999; margin-top:2px }
+.card .desc { font-size:13px; color:#555; margin-top:10px; line-height:1.6 }
+.card .foot { display:flex; align-items:center; gap:10px; margin-top:12px; flex-wrap:wrap }
+.chip { font-size:11px; padding:3px 9px; border-radius:5px; background:#f0ede8; color:#666 }
+.chip.date { background:#eef2ff; color:#3730a3 }
+.go { margin-left:auto; font-size:12px; font-weight:600; color:#3730a3 }
+.footnote { text-align:center; font-size:11px; color:#aaa; padding:22px 0 6px; border-top:1px solid #e5e0d8; margin-top:20px; line-height:1.9 }
+</style></head>
+<body><div class="wrap">
+<div class="head">
+  <h1>YF AI 信号周报</h1>
+  <div class="sub">三份周度模型的在线看板索引 · 美股 / AI 产业链</div>
+  <div class="meta">导航页更新于 2026-10-13 13:43 · 各报告的数据日期以卡片上标注为准</div>
+</div>
+<a class="card" href="co-signal.html" style="border-left-color:#f87171">
+  <div class="top">
+    <div>
+      <div class="t">CO 凸性叠加信号系统</div>
+      <div class="sub2">美股期权微结构 · 凸性叠加激活信号</div>
+    </div>
+    <div class="st" style="color:#f87171">RED</div>
+  </div>
+  <div class="desc">监控做市商 Gamma 生态、波动率期限结构与系统性资金的拥挤度，判断何时需要激活凸性叠加保护（CO）。六维信号按 12 个月历史分位数预警。</div>
+  <div class="foot">
+    <span class="chip date">数据截至 2026-10-12</span>
+    <span class="go">打开 →</span>
+  </div>
+</a>
+
+<a class="card" href="ai-profit-pool-flow.html" style="border-left-color:#e5e0d8">
+  <div class="top">
+    <div>
+      <div class="t">AI 利润池流向监控</div>
+      <div class="sub2">环节间相对动量 · 组合倾斜 · 叙事量级评估</div>
+    </div>
+    <div class="st" style="color:#666">模式 A</div>
+  </div>
+  <div class="desc">跟踪 AI 产业链各环节的相对动量与利润池迁移，输出周度组合倾斜建议；含稳定信号过滤与 NMA 叙事量级评估。</div>
+  <div class="foot">
+    <span class="chip date">数据截至 2026-10-09</span>
+    <span class="go">打开 →</span>
+  </div>
+</a>
+
+<a class="card" href="ai-infra-flow-speed.html" style="border-left-color:#e5e0d8">
+  <div class="top">
+    <div>
+      <div class="t">基建利润流速模型</div>
+      <div class="sub2">三速周期框架 · 乘数矩阵 · 三阶段定位</div>
+    </div>
+    <div class="st" style="color:#666">v0.26</div>
+  </div>
+  <div class="desc">用「速度 A（终端服务化支出 buy）/ 平台传导 / 速度 B（上游自建算力 build）」三速框架观察 AI 基建的利润流速与阶段定位。</div>
+  <div class="foot">
+    <span class="chip date">数据截至 2026-W40</span>
+    <span class="go">打开 →</span>
+  </div>
+</a>
+
+<div class="footnote">
+  三份报告均为自包含静态单页（图表随页面本地渲染，无外部依赖）<br>
+  由 <code>publish.py</code> 生成 · 周度更新后 <code>git push</code> 即可
+</div>
+</div></body></html>

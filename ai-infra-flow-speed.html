@@ -1,0 +1,686 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>基建利润流速模型 · 三速周期框架</title>
+<style>
+:root { color-scheme: light; --bg: #F8F9FA; --card: #FFFFFF; --border: #E5E7EB; --text: #1F2937; --text2: #6B7280; --text3: #9CA3AF; --accent: #E94560; --blue: #3B82F6; --green: #10B981; --amber: #F59E0B; --red: #EF4444; }
+*{margin:0;padding:0;box-sizing:border-box}
+body{font-family:-apple-system,"PingFang SC","Segoe UI",system-ui,sans-serif;background:var(--bg);color:var(--text);line-height:1.6}
+.container{max-width:1200px;margin:0 auto;padding:32px 24px 64px}
+h1{font-size:1.55em;font-weight:700;letter-spacing:-0.02em;margin-bottom:4px}
+.subtitle{font-size:.88em;color:var(--text2);margin-bottom:24px}
+h2{font-size:1.12em;font-weight:600;margin:34px 0 12px;padding-bottom:8px;border-bottom:2px solid var(--border)}
+.card{background:var(--card);border:1px solid var(--border);border-radius:12px;padding:20px 24px;margin-bottom:18px;box-shadow:0 1px 3px rgba(0,0,0,0.04)}
+table{width:100%;border-collapse:collapse;font-size:.82em;margin:8px 0}
+th{background:#F3F4F6;padding:10px 12px;text-align:center;font-weight:600;color:var(--text2);font-size:.78em;text-transform:uppercase;letter-spacing:.04em;border-bottom:2px solid var(--border)}
+td{padding:10px 12px;text-align:center;border-bottom:1px solid var(--border)}
+td.lft{text-align:left;font-weight:600}
+tr:hover td{background:#F9FAFB}
+.tag{display:inline-block;padding:2px 8px;border-radius:4px;font-size:.78em;font-weight:600}
+.tag-red{background:#FEE2E2;color:#991B1B} .tag-green{background:#D1FAE5;color:#065F46}
+.tag-amber{background:#FEF3C7;color:#92400E} .tag-blue{background:#DBEAFE;color:#1E40AF}
+.tag-gray{background:#F3F4F6;color:var(--text2)}
+.big-num{font-size:1.6em;font-weight:800}
+.red{color:var(--red)} .green{color:var(--green)} .amber{color:var(--amber)} .blue{color:var(--blue)}
+.grid-2{display:grid;grid-template-columns:1fr 1fr;gap:16px}
+.grid-4{display:grid;grid-template-columns:repeat(4,1fr);gap:12px}
+.stat-box{background:var(--card);border:1px solid var(--border);border-radius:10px;padding:16px 18px;text-align:center}
+.stat-label{font-size:.75em;color:var(--text2);text-transform:uppercase;letter-spacing:.06em;margin-bottom:4px}
+.note{font-size:.78em;color:var(--text3);margin-top:8px;font-style:italic}
+.conclusion{background:linear-gradient(135deg,#F0F9FF,#ECFDF5);border:1px solid #93C5FD;border-radius:10px;padding:18px 20px;margin-top:14px}
+.conclusion h3{color:var(--blue);font-size:.95em;font-weight:600;margin-bottom:6px}
+@media(max-width:768px){.grid-2,.grid-4{grid-template-columns:1fr}}
+
+.tabs{display:flex;gap:4px;border-bottom:2px solid var(--border);margin-bottom:20px;flex-wrap:wrap}
+.tab-btn{padding:10px 18px;font-size:.88em;font-weight:600;color:var(--text2);background:none;border:1px solid transparent;border-bottom:2px solid transparent;cursor:pointer;border-radius:8px 8px 0 0;font-family:inherit}
+.tab-btn:hover{background:#F3F4F6;color:var(--text)}
+.tab-btn.active{color:var(--accent);border-color:var(--border);border-bottom-color:var(--accent);background:var(--card)}
+.tab-content{display:none}
+.tab-content.active{display:block}
+</style>
+</head>
+<body>
+<div class="container">
+<h1>基建利润流速模型 · 三速周期框架</h1>
+<p class="subtitle">三速对比 · 乘数矩阵 · 三阶段定位 · 6个触发信号 · 数据至 2026-W40（完整周·10/4）+ Ramp 日频至 09-29 + BTOS 202620（23.8%·转平） | v0.26 更新（A″ 分化——W39/W40 上修 · BTOS 渗透率首次转平） · 置信度地基: research/ai-commercial-model-map-methodology.md</p><div style="background:#FFF7ED;border:1px solid #FDBA74;border-radius:8px;padding:10px 14px;margin:10px 0;font-size:0.85em;line-height:1.7">🔒 <strong>口径（v0.19 · 2026-09-04）：</strong>速度 A = <strong>终端服务化支出（buy）</strong>——企业<u>对外购买</u> AI 服务/算力的经常性支出（云/AI API/GPU 云租/软件订阅），<strong>不含自建算力</strong>。自建算力（build：私有化推理/agentic/自购 GPU 服务器）由 <strong>速度 B 供给侧覆盖</strong>（表现为 DELL/HPE/NVDA 等上游收入）。build 与 buy 是替代关系——企业 AI 总需求须 buy+build 综合判断，本页增速读数均为 buy 口径。</div>
+
+
+<div class="tabs">
+  <button class="tab-btn active" data-tab="tab1">① 关键读数</button>
+  <button class="tab-btn" data-tab="tab2">② 计算与假设</button>
+  <button class="tab-btn" data-tab="tab3">③ 三速理念框架</button>
+  <button class="tab-btn" data-tab="tab4">④ 数据源与缺口</button>
+</div>
+<div class="tab-content active" id="tab1">
+<h2 style="margin:12px 0 10px">关键读数</h2>
+
+<!-- 第一行：绝对金额（上游→中游→下游），小字=2027E/2028E规模 -->
+<div class="grid-4">
+<div class="stat-box"><div class="stat-label">上游基建收入（纯上游）</div><div class="big-num blue">$643B</div><div class="note">2026-Q3重估（原$413B·上修56%）· NVDA数据中心$352B主导</div></div>
+<div class="stat-box"><div class="stat-label">平台传导层 · 云收入</div><div class="big-num blue">~$650B</div><div class="note">2027E ~$845B（+30%）· 2028E ~$1,056B（+25%）</div></div>
+<div class="stat-box"><div class="stat-label">供给侧实收（GMF）</div><div class="big-num blue">~$160B</div><div class="note">2027E $232B（+45%）· 2028E $325B（+40%）</div></div>
+<div class="stat-box"><div class="stat-label">终端用户 AI 支出</div><div class="big-num blue">~$1,000B</div><div class="note">2027E ~$1,250B（+25%）· 2028E $1,500-2,200B</div></div>
+</div>
+<div class="note" style="margin-top:4px">资金流方向：终端用户 → 云（中游）→ 上游基建。上游 Capex ~$800B（2026E）是领先驱动（2027E $1.16T → 2028E $1.39T）。供给侧实收是终端支出里"已实现货币化"的部分（最严格口径）。</div>
+
+<!-- 第二行：三个速度（对齐第一行），小字=上一锚点增速（便于加速度比较） -->
+<div class="grid-4" style="margin-top:12px">
+<div class="stat-box"><div class="stat-label">速度 B · 上游基建</div><div class="big-num red">+79%</div><div class="note">2026-Q3重估（保守·报告+86%）· Q2 +55.6% → 加速<br>AVGO FY26Q3 <strong>+85.5%</strong> YoY（9/10）落地确认</div></div>
+<div class="stat-box"><div class="stat-label">平台传导层 · 云</div><div class="big-num red">+54%</div><div class="note">AI云 +54% → 总营收口径 +22.4% → 加速<br>云厂 Q3 财报 10 月底才出（本周无新硬数据）</div></div>
+<div class="stat-box"><div class="stat-label">速度 A（buy）· 服务化支出</div><div class="big-num amber">分化</div><div class="note">用量强、货币化回稳 ↔ 企业实付层仍弱<br>付费 <strong>147.22T（+16.7%）</strong>·货币化 <strong>$120.5M（+6.5%）</strong>·均价 <strong>1.1459（+10.8%）</strong><br>⚠ W39/W40 均上修（W39 付费 112.29T→126.15T）——W39 单周走弱在 W40 回稳<br>★ Ramp 仍弱：日频单价通缩（anthropic $0.824/M）·Top1% <strong>−9.7%</strong></div></div>
+<div class="stat-box"><div class="stat-label">gap₁ = 速度B−平台层</div><div class="big-num amber">+57%</div><div class="note">2026-Q3重估（保守·区间+57%~+64%）· AI云口径gap₁≈+1.6% · 平台层自我膨胀警示</div></div>
+</div>
+
+<!-- 第三行：乘数（对齐第一行），小字=推导逻辑 -->
+<div class="grid-4" style="margin-top:12px">
+<div class="stat-box"><div class="stat-label">模型厂乘数（上游最粗管）</div><div class="big-num red">0.42</div><div class="note">=模型厂capex÷ARR · Anthropic −$14B/$44B · 直接买GPU</div></div>
+<div class="stat-box"><div class="stat-label">云大厂乘数（中游）</div><div class="big-num red">0.42</div><div class="note">=四巨头AI capex÷云收入 · ~$275B/$650B</div></div>
+<div class="stat-box"><div class="stat-label">企业终端乘数（下游）</div><div class="big-num green">0.06</div><div class="note">=三层衰减推断（终端→应用→云→芯片）</div></div>
+<div class="stat-box"><div class="stat-label">阶段Ⅲ上游收缩空间</div><div class="big-num red">10-20%</div><div class="note">⚠ 未来风险情景 · 周期见顶时上游净支出回落幅度</div></div>
+</div>
+
+<h2 style="margin:20px 0 10px">周频动态观察（OpenRouter · 完整周 2026-W40 · 10-04）</h2>
+<div class="card" style="background:linear-gradient(135deg,#F0F9FF,#F5F3FF);border:1px solid #93C5FD">
+<div class="note" style="margin-bottom:10px">🔵 周频 proxy（领先 1-2 季）→ 对应上方季度读数。OpenRouter 是 API 层样本（~全市场1/4 token、~1/5 API支出），看增速/结构，不看绝对量。<strong>⚠ 口径：以"完整周"为准</strong>——<strong>周日更新取"上周完整周"</strong>（当周结束日=更新日、未完整），故本期本期=W40（10/4），<strong>W41（128.91T）结束日=本更新日、不入判断</strong>。另：W39/W40 本次拉取均<strong>上修</strong>（W39 付费 112.29T→126.15T），历史水平不可跨拉取日比较。</div>
+<div class="note" style="margin-bottom:10px;background:#FFF7ED;border-left:3px solid #FDBA74;padding:8px 10px">⚠ <strong>另一类漂移：货币化"水平值"随价格表重算而变</strong>（v0.23 新增）。<code>monetized_usd = matched_paid × 混合单价</code>，而价格表每次重拉（本次 <strong>458 个模型</strong>）——故 W35 由 $67.7M 重算为 <strong>$60.0M</strong>、W36 由 $94.9M 重算为 <strong>$86.3M</strong>，而 <strong>token 量分毫未动</strong>。⇒ <strong>历史货币化的水平值不可跨拉取日比较，只有同一次拉取内的环比/同比有效。</strong>（与"平台事后修订"性质不同：这是我方重算漂移，PIT 快照挡不住。）</div>
+<div class="grid-4">
+<div class="stat-box"><div class="stat-label">🔵 货币支出（→速度A）</div><div class="big-num blue">$120.5M</div><div class="note">W39 $113.1M → W40 <strong style="color:#2563EB">+6.5%</strong><br>→ W39 单周走弱在 W40 <strong>回稳</strong></div></div>
+<div class="stat-box"><div class="stat-label">🔵 付费 Token（→终端用量·<strong>主口径</strong>）</div><div class="big-num blue">147.2T</div><div class="note">W39 126.15T → W40 <strong>+16.7%</strong><br>→ 用量<strong>强</strong>。⚠W39/W40 均上修</div></div>
+<div class="stat-box"><div class="stat-label">🔵 免费占比（结构观察项·<strong>不作用量代理</strong>）</div><div class="big-num green">5.2%</div><div class="note">W39 6.7% → W40 <strong>5.2%</strong><br>前一尖峰（W39 前的 16.2%）已回落</div></div>
+<div class="stat-box"><div class="stat-label">🔵 加权有效单价</div><div class="big-num amber">1.1459</div><div class="note">W39 1.0343 → W40 <strong>+10.8%</strong><br>→ 含模型结构上移，非单向通缩</div></div>
+</div>
+<div class="note" style="margin-top:10px">⚠ 高弹性样本折扣：OpenRouter 是需求弹性最高人群（开发者），全市场增速≈它×0.3-0.5。货币支出增速是速度A（buy）的领先仪表盘（非总量替代）——见方法论 §2.5 v0.14。<strong>W41（128.91T·不完整周）不入表</strong>。</div>
+</div>
+
+<h2 style="margin:20px 0 10px">⭐ 速度A 双锚点（月度 Ramp + 双周 BTOS）</h2>
+<div class="card" style="background:linear-gradient(135deg,#FEF3C7,#FEF9F0);border:1px solid #FCD34D">
+<div class="note" style="margin-bottom:10px">⭐ <strong>Ramp token 单价为企业实付口径（主锚点·月度）</strong>，OpenRouter 为高弹性开发者样本（周频辅锚·看方向）。两者水平与幅度可不一致——Ramp 通缩显著快于 OpenRouter（见下）。</div>
+<div class="grid-4">
+<div class="stat-box"><div class="stat-label">⭐ Ramp 有效 token 单价</div><div class="big-num amber">$0.702/M</div><div class="note">2026-09-29（<strong>新口径·cost/count·all_tokens</strong>）<br>OpenAI $0.596 vs Anthropic $0.824 · <strong style="color:var(--red)">持续通缩</strong>（anthropic 5日 0.9045→0.8241）<br>⚠ 旧 Datawrapper 图口径已失效，取数法重建</div></div>
+<div class="stat-box"><div class="stat-label">Ramp 人均支出 Top1%</div><div class="big-num amber">$7,205</div><div class="note">2026-08 · 环比 <strong style="color:var(--red)">−9.7%</strong>（$7,976→$7,205；⚠7月值本次上修，旧基数 $8,025 口径下为 −10.2%）<br>Top10% +4.8% / 中位 +5.2%（仍涨）</div></div>
+<div class="stat-box"><div class="stat-label">Ramp 采用率</div><div class="big-num blue">56.1%</div><div class="note">+0.42pp · 增量递减（+0.76→+0.42）<br>→ 渗透率增长减速（月频仍停 8 月）</div></div>
+<div class="stat-box"><div class="stat-label">Census BTOS 采用率</div><div class="big-num amber">23.8%</div><div class="note"><strong>+0.0pp</strong>（202620期·采集至 10/04）· 预期 27.7%（+0.1pp）<br>→ <strong style="color:var(--amber)">渗透率首次转平</strong>（追踪项④触发）</div></div>
+</div>
+<div class="note" style="margin-top:10px">⚠ <strong>本期双锚点分化加剧</strong>：Ramp（企业实付）单价持续通缩 + Top1% 连续收缩；<strong>BTOS 全国渗透率首次转平</strong>（+0.0pp，此前 +0.8/+0.6/+0.6）——广度扩散出现停滞信号。Ramp 月频图本期仍未推进（停 8 月），日频推进至 9/29。⚠ Ramp 取数法已重建（旧 Datawrapper 失效）——见 <code>scripts/ramp_ai_index_fetch.py</code>。</div>
+</div>
+
+<h2 style="margin:20px 0 10px">编码 agent 负载 · 应用与模型结构（周频）</h2>
+<div class="card" style="background:linear-gradient(135deg,#F0F9FF,#F5F3FF);border:1px solid #93C5FD">
+<div class="note" style="margin-bottom:10px">🔵 应用维度（app-rankings）→ 编码场景用量 A″ 领先代理。⚠ 编码 agent 属高弹性开发者样本（非低弹性企业负载）——看结构/增速，货币化判断需打折（见方法论 §2.6）。</div>
+<div class="grid-4">
+<div class="stat-box"><div class="stat-label">🔵 编码 agent 占比</div><div class="big-num blue">81.1%</div><div class="note">W40 窗口编码 agent token 占比（W39 83.3%）<br>👀 占比自 ~90% 回落 → 需求结构向其他场景扩散</div></div>
+<div class="stat-box"><div class="stat-label">🔵 编码 agent token</div><div class="big-num blue">61.8T</div><div class="note">W40（W39 44.4T → <strong>+39%</strong>）<br>→ 与 OpenRouter 用量同步走强</div></div>
+<div class="stat-box"><div class="stat-label">🟢 Top 编码工具</div><div class="big-num blue">Hermes Agent</div><div class="note">连续 8 周第一<br>→ 领先生态：Hermes 碾压</div></div>
+<div class="stat-box"><div class="stat-label">🔵 trending 超额增长</div><div class="big-num amber">Claude Code 4.5T</div><div class="note">Kilo Code 2.7T · Cline 2.6T · Codex 1.1T<br>→ 新 agent 放量中</div></div>
+</div>
+<div class="note" style="margin-top:10px">桥接状态：编码 agent 增速 × <strong>k≈0.30-0.46</strong> → 企业 Copilot 席位增速预期（领先 1 季，待 10 月微软财报验证）· 弹性梯度：企业端(Ramp 中位 YoY +164%)韧性 &gt; 开发者端(OpenRouter W40 货币化 <strong>+6.5%</strong>·量 <strong>+16.7%</strong>·均较 W39 回升) → 本期两端口径同向偏强。⚠ 但 <strong>Ramp 企业实付层仍弱</strong>（日频单价通缩、Top1% 连续收缩）、且 <strong>BTOS 渗透率首次转平</strong>——弹性梯度与广度扩散均需下期复读；Ramp 月频仍停 8 月。</div>
+</div>
+
+<div class="card" style="background:linear-gradient(135deg,#F5F3FF,#FEF3F8);border:1px solid #C4B5FD">
+<div class="note" style="margin-bottom:10px">🟣 模型结构（rankings-daily）→ 前沿 vs 开源洪流。"以量补价"：前沿绝对量涨但占比被稀释；开源洪流暴增 → 云平台托管开源受益（价格战利好平台层机制）。</div>
+<div class="grid-4">
+<div class="stat-box"><div class="stat-label">🟣 前沿封闭</div><div class="big-num blue">19.6T</div><div class="note">占比 21.0%（W09 42% → 持续稀释）<br>Anthropic/OpenAI/Gemini/Grok</div></div>
+<div class="stat-box"><div class="stat-label">🟣 开源洪流</div><div class="big-num green">29.1T</div><div class="note">占比 31.2% · 0.7T→29T 40x 暴增<br>DeepSeek/Qwen/GLM/Llama</div></div>
+<div class="stat-box"><div class="stat-label">🟣 其他（长尾+stealth）</div><div class="big-num amber">44.7T</div><div class="note">占比 47.9% · W34 暴增（Ox Alpha 免费）<br>→ 免费冲击→货币化侵蚀</div></div>
+<div class="stat-box"><div class="stat-label">⚡ 结构性盲区</div><div class="big-num red">开源下界</div><div class="note">云托管开源（Bedrock/Vertex/Azure）不可见<br>→ 真实开源主导更极端</div></div>
+</div>
+</div>
+
+<h2>速度 A（供给侧实收）· 三档情景</h2>
+<div class="card" style="margin-bottom:18px">
+<table>
+<tr><th>情景</th><th>触发条件</th><th>2026</th><th>2027E</th><th>2028E</th><th>模型层</th><th>平台层</th></tr>
+<tr><td class="lft">乐观</td><td style="text-align:left;font-size:0.82em">价格战收敛/免费模型收费</td><td>$160B</td><td>$256B</td><td>$397B</td><td>+60%</td><td>+60%</td></tr>
+<tr><td class="lft"><strong>中性</strong></td><td style="text-align:left;font-size:0.82em">价格战可控（当前基准）</td><td>$160B</td><td><strong>$232B</strong></td><td><strong>$325B</strong></td><td>+45%</td><td>+54%</td></tr>
+<tr><td class="lft">悲观</td><td style="text-align:left;font-size:0.82em">免费抢量升级（Ox Alpha 式）</td><td>$160B</td><td>$208B</td><td>$260B</td><td>&lt;+20%</td><td>+40%</td></tr>
+</table>
+<div class="note">方法：模型层（价崩，OpenRouter 货币支出增速×弹性折扣0.3-0.5）+ 平台层（量增，Copilot 席位/BTOS 验证低弹性渗透）。模型层看 OpenRouter 领先指标，平台层看低弹性部分是否独立增长。</div>
+</div>
+
+
+
+
+
+<h2>OpenRouter 样本 · 周频时序（速度 A·buy 服务化 用量/货币化代理）</h2>
+
+<div class="card" style="margin-bottom:18px">
+<h3 style="margin-bottom:10px">OpenRouter 样本 · 增速快照（2026-W40 · 2026-10-04）</h3>
+<div class="grid-4">
+  <div class="stat-box"><div class="stat-label">Token 周环比</div><div class="big-num" style="font-size:1.25em"><span style="color:var(--green);font-weight:700">+13.7%</span></div><div class="note">vs 2026-W39 · 145.85T</div></div>
+  <div class="stat-box"><div class="stat-label">Token 月环比</div><div class="big-num" style="font-size:1.25em"><span style="color:var(--green);font-weight:700">+43.7%</span></div><div class="note">vs 2026-W36 · 4周</div></div>
+  <div class="stat-box"><div class="stat-label">Token 同比</div><div class="big-num" style="font-size:1.25em;color:var(--green)">8.2x</div><div class="note">vs 2026-W12</div></div>
+  <div class="stat-box"><div class="stat-label">货币支出 周环比</div><div class="big-num" style="font-size:1.25em"><span style="color:var(--green);font-weight:700">+6.5%</span></div><div class="note">vs 2026-W39 · $113.1M</div></div>
+  <div class="stat-box"><div class="stat-label">货币支出 月环比</div><div class="big-num" style="font-size:1.25em"><span style="color:var(--green);font-weight:700">+33.4%</span></div><div class="note">vs 2026-W36 · 4周</div></div>
+  <div class="stat-box"><div class="stat-label">货币支出 同比</div><div class="big-num" style="font-size:1.25em;color:var(--green)">13.4x</div><div class="note">vs 2026-W12</div></div>
+  <div class="stat-box"><div class="stat-label">加权平均单价</div><div class="big-num" style="font-size:1.25em;color:var(--blue)">$1.15</div><div class="note">$/M token · W39 $1.03</div></div>
+  <div class="stat-box"><div class="stat-label">免费占比</div><div class="big-num" style="font-size:1.25em;color:var(--amber)">5.2%</div><div class="note">免费/pricing==0 · W39 6.7%</div></div>
+</div>
+</div>
+
+<div class="grid-2">
+<div class="card" style="margin-bottom:0">
+<h3 style="margin-bottom:6px">总 Token 量 vs 总货币支出</h3>
+<svg viewBox="0 0 520 260" style="width:100%;height:auto;font-family:inherit">
+<line x1="46" y1="26.0" x2="468" y2="26.0" stroke="#EEF0F3" stroke-width="1"/>
+<text x="41" y="29.0" text-anchor="end" font-size="9" fill="#9CA3AF">132</text>
+<line x1="46" y1="74.0" x2="468" y2="74.0" stroke="#EEF0F3" stroke-width="1"/>
+<text x="41" y="77.0" text-anchor="end" font-size="9" fill="#9CA3AF">102</text>
+<line x1="46" y1="122.0" x2="468" y2="122.0" stroke="#EEF0F3" stroke-width="1"/>
+<text x="41" y="125.0" text-anchor="end" font-size="9" fill="#9CA3AF">72</text>
+<line x1="46" y1="170.0" x2="468" y2="170.0" stroke="#EEF0F3" stroke-width="1"/>
+<text x="41" y="173.0" text-anchor="end" font-size="9" fill="#9CA3AF">42</text>
+<line x1="46" y1="218.0" x2="468" y2="218.0" stroke="#EEF0F3" stroke-width="1"/>
+<text x="41" y="221.0" text-anchor="end" font-size="9" fill="#9CA3AF">12</text>
+<text x="473" y="29.0" font-size="9" fill="#6B7280">$101</text>
+<text x="473" y="77.0" font-size="9" fill="#6B7280">$77</text>
+<text x="473" y="125.0" font-size="9" fill="#6B7280">$53</text>
+<text x="473" y="173.0" font-size="9" fill="#6B7280">$29</text>
+<text x="473" y="221.0" font-size="9" fill="#6B7280">$5</text>
+<text x="46.0" y="236" text-anchor="middle" font-size="8.5" fill="#9CA3AF">03-16</text>
+<text x="113.5" y="236" text-anchor="middle" font-size="8.5" fill="#9CA3AF">04-13</text>
+<text x="181.0" y="236" text-anchor="middle" font-size="8.5" fill="#9CA3AF">05-11</text>
+<text x="248.6" y="236" text-anchor="middle" font-size="8.5" fill="#9CA3AF">06-08</text>
+<text x="316.1" y="236" text-anchor="middle" font-size="8.5" fill="#9CA3AF">07-06</text>
+<text x="383.6" y="236" text-anchor="middle" font-size="8.5" fill="#9CA3AF">08-03</text>
+<text x="451.1" y="236" text-anchor="middle" font-size="8.5" fill="#9CA3AF">08-31</text>
+<text x="468.0" y="236" text-anchor="middle" font-size="8.5" fill="#9CA3AF">09-07</text>
+<polygon points="46,218 46.0,205.5 62.9,201.7 79.8,194.7 96.6,204.3 113.5,205.2 130.4,202.9 147.3,199.8 164.2,196.7 181.0,194.9 197.9,191.6 214.8,209.3 231.7,204.4 248.6,198.0 265.4,163.2 282.3,163.1 299.2,163.1 316.1,153.6 333.0,137.3 349.8,144.9 366.7,146.9 383.6,127.3 400.5,117.2 417.4,88.3 434.2,56.8 451.1,52.8 468.0,34.7 468.0,218" fill="#E94560" opacity="0.12"/>
+<polyline points="46.0,205.5 62.9,201.7 79.8,194.7 96.6,204.3 113.5,205.2 130.4,202.9 147.3,199.8 164.2,196.7 181.0,194.9 197.9,191.6 214.8,209.3 231.7,204.4 248.6,198.0 265.4,163.2 282.3,163.1 299.2,163.1 316.1,153.6 333.0,137.3 349.8,144.9 366.7,146.9 383.6,127.3 400.5,117.2 417.4,88.3 434.2,56.8 451.1,52.8 468.0,34.7" fill="none" stroke="#E94560" stroke-width="2"/>
+<polyline points="46.0,209.3 62.9,207.7 79.8,209.3 96.6,205.9 113.5,206.3 130.4,202.9 147.3,200.5 164.2,197.9 181.0,196.4 197.9,194.0 214.8,208.5 231.7,204.5 248.6,204.5 265.4,172.9 282.3,173.3 299.2,167.1 316.1,168.9 333.0,163.0 349.8,159.2 366.7,150.4 383.6,135.1 400.5,102.1 417.4,117.6 434.2,107.9 451.1,55.6 468.0,34.7" fill="none" stroke="#3B82F6" stroke-width="1.8" stroke-dasharray="5,3"/>
+<circle cx="50" cy="14" r="4" fill="#E94560"/><text x="58" y="17" font-size="10" fill="#374151">总Token量(T)</text>
+<circle cx="196" cy="14" r="4" fill="#3B82F6"/><text x="204" y="17" font-size="10" fill="#374151">总货币支出($M)</text>
+<circle cx="468.0" cy="34.7" r="4" fill="#E94560"/>
+<text x="468.0" y="26.7" text-anchor="middle" font-size="9.5" font-weight="700" fill="#E94560">127</text>
+<circle cx="468.0" cy="34.7" r="4" fill="#3B82F6"/>
+<text x="468.0" y="50.7" text-anchor="middle" font-size="9.5" font-weight="700" fill="#3B82F6">$97</text>
+</svg>
+<div class="note">OpenRouter 单平台样本（~全市场1/4）· token含免费+other · 货币支出=付费token×混合单价 · 2026-W14起货币支出可信</div>
+</div>
+<div class="card" style="margin-bottom:0">
+<h3 style="margin-bottom:6px">加权平均单价 vs 付费占比</h3>
+<svg viewBox="0 0 520 260" style="width:100%;height:auto;font-family:inherit">
+<line x1="46" y1="26.0" x2="468" y2="26.0" stroke="#EEF0F3" stroke-width="1"/>
+<text x="41" y="29.0" text-anchor="end" font-size="9" fill="#9CA3AF">$1.15</text>
+<line x1="46" y1="74.0" x2="468" y2="74.0" stroke="#EEF0F3" stroke-width="1"/>
+<text x="41" y="77.0" text-anchor="end" font-size="9" fill="#9CA3AF">$1.03</text>
+<line x1="46" y1="122.0" x2="468" y2="122.0" stroke="#EEF0F3" stroke-width="1"/>
+<text x="41" y="125.0" text-anchor="end" font-size="9" fill="#9CA3AF">$0.91</text>
+<line x1="46" y1="170.0" x2="468" y2="170.0" stroke="#EEF0F3" stroke-width="1"/>
+<text x="41" y="173.0" text-anchor="end" font-size="9" fill="#9CA3AF">$0.79</text>
+<line x1="46" y1="218.0" x2="468" y2="218.0" stroke="#EEF0F3" stroke-width="1"/>
+<text x="41" y="221.0" text-anchor="end" font-size="9" fill="#9CA3AF">$0.68</text>
+<text x="473" y="29.0" font-size="9" fill="#6B7280">91%</text>
+<text x="473" y="77.0" font-size="9" fill="#6B7280">84%</text>
+<text x="473" y="125.0" font-size="9" fill="#6B7280">77%</text>
+<text x="473" y="173.0" font-size="9" fill="#6B7280">70%</text>
+<text x="473" y="221.0" font-size="9" fill="#6B7280">63%</text>
+<text x="46.0" y="236" text-anchor="middle" font-size="8.5" fill="#9CA3AF">03-16</text>
+<text x="113.5" y="236" text-anchor="middle" font-size="8.5" fill="#9CA3AF">04-13</text>
+<text x="181.0" y="236" text-anchor="middle" font-size="8.5" fill="#9CA3AF">05-11</text>
+<text x="248.6" y="236" text-anchor="middle" font-size="8.5" fill="#9CA3AF">06-08</text>
+<text x="316.1" y="236" text-anchor="middle" font-size="8.5" fill="#9CA3AF">07-06</text>
+<text x="383.6" y="236" text-anchor="middle" font-size="8.5" fill="#9CA3AF">08-03</text>
+<text x="451.1" y="236" text-anchor="middle" font-size="8.5" fill="#9CA3AF">08-31</text>
+<text x="468.0" y="236" text-anchor="middle" font-size="8.5" fill="#9CA3AF">09-07</text>
+<polygon points="46,218 46.0,84.7 62.9,87.8 79.8,105.0 96.6,83.9 113.5,88.6 130.4,69.3 147.3,34.7 164.2,43.9 181.0,107.5 197.9,121.3 214.8,160.3 231.7,163.1 248.6,209.3 265.4,146.5 282.3,144.3 299.2,129.0 316.1,139.1 333.0,140.1 349.8,176.0 366.7,135.8 383.6,158.4 400.5,83.6 417.4,153.8 434.2,180.2 451.1,117.5 468.0,129.5 468.0,218" fill="#10B981" opacity="0.12"/>
+<polyline points="46.0,84.7 62.9,87.8 79.8,105.0 96.6,83.9 113.5,88.6 130.4,69.3 147.3,34.7 164.2,43.9 181.0,107.5 197.9,121.3 214.8,160.3 231.7,163.1 248.6,209.3 265.4,146.5 282.3,144.3 299.2,129.0 316.1,139.1 333.0,140.1 349.8,176.0 366.7,135.8 383.6,158.4 400.5,83.6 417.4,153.8 434.2,180.2 451.1,117.5 468.0,129.5" fill="none" stroke="#10B981" stroke-width="2"/>
+<polyline points="46.0,92.2 62.9,77.9 79.8,209.3 96.6,125.8 113.5,58.0 130.4,88.8 147.3,163.4 164.2,142.9 181.0,73.1 197.9,58.0 214.8,54.6 231.7,49.1 248.6,51.2 265.4,40.9 282.3,34.7 299.2,42.9 316.1,126.4 333.0,172.3 349.8,78.5 366.7,82.6 383.6,62.8 400.5,55.3 417.4,62.1 434.2,68.3 451.1,83.3 468.0,55.9" fill="none" stroke="#F59E0B" stroke-width="1.8" stroke-dasharray="5,3"/>
+<circle cx="50" cy="14" r="4" fill="#10B981"/><text x="58" y="17" font-size="10" fill="#374151">加权平均单价($/M)</text>
+<circle cx="196" cy="14" r="4" fill="#F59E0B"/><text x="204" y="17" font-size="10" fill="#374151">付费占比(%)</text>
+<circle cx="468.0" cy="129.5" r="4" fill="#10B981"/>
+<text x="468.0" y="121.5" text-anchor="middle" font-size="9.5" font-weight="700" fill="#10B981">$0.89</text>
+<circle cx="468.0" cy="55.9" r="4" fill="#F59E0B"/>
+<text x="468.0" y="71.9" text-anchor="middle" font-size="9.5" font-weight="700" fill="#F59E0B">87%</text>
+</svg>
+<div class="note">加权平均单价=总货币支出÷matched_paid（$/M token）· 付费占比=付费/总 · 免费判定用 pricing==0</div>
+</div>
+</div>
+
+<h2>利润流速乘数矩阵</h2>
+<div class="card">
+<table>
+<tr><th style="text-align:left">客户层</th><th>NVDA DC 收入中该层占比</th><th>该层自身年收入</th><th>该层→上游支出</th><th>流速乘数</th><th>年化增速</th><th>水管直径</th></tr>
+<tr>
+<td class="lft">① 前沿模型厂<br><span style="font-size:0.75em;color:var(--text3)">Anthropic/OpenAI/xAI</span></td>
+<td>~15-18%<br><span class="tag tag-red">~$11-13B</span></td>
+<td>~$60-70B ARR</td>
+<td>~$25-35B</td>
+<td><span class="tag tag-red">0.42</span></td>
+<td>~+200%→见顶中<br><span class="tag tag-amber">⚠翻倍节奏可能放缓</span></td>
+<td style="font-size:1.4em">🟦🟦🟦🟦</td>
+</tr>
+<tr>
+<td class="lft">② 超大规模云<br><span style="font-size:0.75em;color:var(--text3)">MSFT/AMZN/GOOGL/META</span></td>
+<td>~50%<br><span class="tag tag-amber">~$37-38B</span></td>
+<td>~$650B+ 云收入</td>
+<td>~$270-280B<br><span style="font-size:0.78em;color:var(--text3)">AI capx部分</span></td>
+<td><span class="tag tag-amber">0.42</span></td>
+<td>~+89% capEx<br><span class="tag tag-green">Q2确认+10%</span></td>
+<td style="font-size:1.4em">🟦🟦🟦🟦🟦</td>
+</tr>
+<tr>
+<td class="lft">③ 企业终端用户<br><span style="font-size:0.75em;color:var(--text3)">PLTR/SAP/NOW+间接买GPU</span></td>
+<td>~12-15%<br><span class="tag tag-blue">~$9-11B</span></td>
+<td>~$600B+<br><span style="font-size:0.78em;color:var(--text3)">AI最终用户池</span></td>
+<td>~$30-50B<br><span style="font-size:0.78em;color:var(--text3)">经云/应用层衰减</span></td>
+<td><span class="tag tag-blue">0.06</span></td>
+<td>+20-30%</td>
+<td style="font-size:1.4em">🟦</td>
+</tr>
+<tr>
+<td class="lft">④ 主权/超算/AI云<br><span style="font-size:0.75em;color:var(--text3)">ACIE非企业部分</span></td>
+<td>~18-20%<br><span class="tag tag-gray">~$13-15B</span></td>
+<td>N/A</td>
+<td>~$13-15B</td>
+<td><span class="tag tag-gray">N/A</span></td>
+<td>较平</td>
+<td style="font-size:1.4em">🟦🟦</td>
+</tr>
+</table>
+<div class="note">流速乘数 = 该层每 $1 收入能转化成多少上游芯片/网络支出；流速 = 乘数 × 该层收入增速。链越长乘数越低——企业终端经应用层→云→芯片三跳后只剩 6%。「NVDA DC 收入中该层占比」用于校验四层加总≈100%（注：此为 NVDA 单一公司口径，用于拆分客户层；上游基建核心硬件全面口径见顶部摘要 ~$0.8T = NVDA DC + AMD DC + AVGO + MU + ANET 年化）。模型厂乘数基于 Anthropic OI−$14B plan vs $44B ARR；云乘数基于四巨头 AI capEx/云收入。<strong>乘数的商业逻辑基础见 research/ai-commercial-model-map-methodology.md（为什么模型厂高、企业低）。</strong></div>
+</div>
+
+
+<div class="card" style="margin-top:4px">
+<h3>与利润流管线的协同</h3>
+<table>
+<tr><th style="text-align:left">维度</th><th style="text-align:left">利润流 (W40)</th><th style="text-align:left">利润流速 (本文)</th></tr>
+<tr><td class="lft">核心问题</td><td style="text-align:left;font-size:0.82em">利润流向哪里？</td><td style="text-align:left;font-size:0.82em">流速是否在威胁利润流判断？周期在哪一阶段？</td></tr>
+<tr><td class="lft">时间尺度</td><td style="text-align:left;font-size:0.82em">截面（周度 z-score）</td><td style="text-align:left;font-size:0.82em">前瞻（乘数变化 + 三速gap → 未来1-2季）</td></tr>
+<tr><td class="lft">关键信号</td><td style="text-align:left;font-size:0.82em">利润流最新档数据至 2026-10-02（见利润池 W43 档）· 环节价格分化 · 存储/网络为前期焦点</td><td style="text-align:left;font-size:0.82em">AVGO FY26Q3 +85.5% YoY 确认上游加速（无新财报）· <strong>OpenRouter W40 付费 +16.7%、货币化 +6.5%（A″ 转为分化）</strong> · ⚠ 但 <strong>Ramp 企业实付层仍弱</strong>（单价通缩、Top1% −9.7%）且 <strong>BTOS 渗透率首次转平</strong></td></tr>
+<tr><td class="lft">互补关系</td><td colspan="2" style="text-align:left;font-size:0.82em">利润流告诉你「现在钱在哪里」，利润流速告诉你「哪些水管在变粗/变细 + 周期阶段」——后者是前者的前瞻修正。本期两条信源<strong>方向分化</strong>：上游财报仍支持阶段Ⅰ、OpenRouter 用量与货币化在 W40 回升，但 <strong>Ramp 企业实付层持续偏弱 + BTOS 渗透率转平</strong>——广度扩散出现停滞信号。这正是利润流（截面）看不到、流速模型（前瞻）新增的监控项。<strong>阶段Ⅰ维持（按决策不切）</strong>，终端信号待 Ramp 月频推进到 9 月后复读。三速框架为利润池的环节信号提供「周期语境」——某信号在当前阶段是常规还是异常。</td></tr>
+</table>
+</div>
+
+
+</div>
+<div class="tab-content" id="tab2">
+<h2>三个速度怎么算出来的 · 口径与公式</h2>
+<div class="card">
+<table>
+<tr><th style="text-align:left">速度</th><th style="text-align:left">计算公式</th><th>当前读数</th><th style="text-align:left">口径要点 · 已知偏差</th></tr>
+<tr>
+  <td class="lft">速度 B<br><span style="font-weight:400;color:var(--text2);font-size:.9em">上游基建收入</span></td>
+  <td style="text-align:left;font-size:0.82em">M0 公司级 TRC 权重 × 各环节公司营收 YoY（revenue_base 等权均值）<br><span style="color:var(--text2)">权重已做纯度折算 + 跨 ETF 去重</span></td>
+  <td><span class="big-num">+79%</span><br><span style="font-size:.82em;color:var(--text2)">2026-Q3 重估<br>（报告口径 +86%）</span></td>
+  <td style="text-align:left;font-size:0.78em">仅上游基建 <strong>L1-L5 + L7-L9</strong>；<strong>L6 云平台不计入</strong>（属平台传导层，独立观测）。<br>⚠ 环节内未按收入加权 → L1 中 NVDA 主导被等权低估</td>
+</tr>
+<tr>
+  <td class="lft">平台传导层<br><span style="font-weight:400;color:var(--text2);font-size:.9em">L6 云收入</span></td>
+  <td style="text-align:left;font-size:0.82em">Hyperscaler 四家总营收均值 YoY<br><span style="color:var(--text2)">AI 云口径：Azure+43 / AWS+37 / GCP+81 三家均值</span></td>
+  <td><span class="big-num">22.4%</span><br><span style="font-size:.82em;color:var(--text2)">AI 云口径 +54%</span></td>
+  <td style="text-align:left;font-size:0.78em">⚠ <strong>总营收口径低估 AI 增长</strong>——两口径使 gap₁ 在 +57% 与 +1.6% 间摆动，是结论最敏感处</td>
+</tr>
+<tr>
+  <td class="lft">速度 A（buy）<br><span style="font-weight:400;color:var(--text2);font-size:.9em">终端服务化支出</span></td>
+  <td style="text-align:left;font-size:0.82em"><strong>五源综合</strong>：Ramp 人均支出（上界·月）+ BTOS 渗透率（下界·双周）+ OpenRouter 斜率（周）+ AA 单位成本 + 云 AI 增速<br><span style="color:var(--text2)">三源符号不一致时以 A″（加速度）定调</span></td>
+  <td><span class="big-num" style="color:#EA580C">分化</span><br><span style="font-size:.82em;color:var(--text2)">付费量 +16.7%<br>货币化 +6.5%（W40 回升）<br>⚠ Ramp/BTOS 仍弱</span></td>
+  <td style="text-align:left;font-size:0.78em">⚠ 仅"对外购买"口径，<strong>不含自建算力（build）</strong>；build 归速度 B 供给侧覆盖。buy 与 build 是替代关系</td>
+</tr>
+</table>
+<div class="note">数据源分层与更新方法见 <code>research/ai-infra-flow-speed-methodology.md</code> §3.2；本节口径修订日志见 Tab4。</div>
+</div>
+
+<h2>两个 gap + 一个加速度 · 定义式</h2>
+<div class="card">
+<table>
+<tr><th style="text-align:left">变量</th><th style="text-align:left">定义式</th><th>当前值</th><th style="text-align:left">它度量什么</th></tr>
+<tr><td class="lft">gap₁</td><td style="text-align:left;font-size:0.82em">= 速度 B − 平台传导层</td><td><span class="big-num">+57%</span><br><span style="font-size:.82em;color:var(--text2)">AI 云口径 ≈ +1.6%</span></td><td style="text-align:left;font-size:0.82em"><strong>阶段定位主参考</strong>——上游相对平台层的领先程度</td></tr>
+<tr><td class="lft">gap₂</td><td style="text-align:left;font-size:0.82em">= 平台层（AI 云口径）− 速度 A</td><td><span class="big-num">+31.6%</span></td><td style="text-align:left;font-size:0.82em">乐观预期膨胀 + 内部循环的规模（含模型商训练算力费计入云收入）</td></tr>
+<tr><td class="lft">A″</td><td style="text-align:left;font-size:0.82em">= 终端服务化支出增速的<strong>加速度</strong></td><td><span class="big-num amber">分化</span></td><td style="text-align:left;font-size:0.82em">终端二次加速时，<strong>gap₁ 收窄 ≠ 阶段切换</strong>——可能是第二波长鞭正在形成</td></tr>
+</table>
+<div class="note">阶段判定优先级：① gap₁ → ② gap₂ → ③ A″ → ④ 前沿模型 capex 增速 → ⑤ 终端需求来源分解 → ⑥ 三速绝对水平。</div>
+</div>
+
+<h2>六口径分层 · 防口径混用的权威对照</h2>
+<div class="card">
+<p style="font-size:0.84em;color:var(--text2);margin-bottom:6px">⚠ 背景：OpenRouter 样本周支出仅 ~$3B/年，与利润池 $1,000B 差 300 倍——<strong>这不是样本差，而是口径差</strong>。以下六口径度量价值链不同环节，<strong>不可直接对比</strong>。</p>
+<table>
+<tr><th>#</th><th style="text-align:left">口径</th><th>2026 量级</th><th style="text-align:left">定义</th><th style="text-align:left">环节</th></tr>
+<tr><td>①</td><td class="lft">利润池口径</td><td><strong>~$1,000B</strong></td><td style="text-align:left;font-size:0.82em">最终端用户为 AI 产品/服务支付的总收入（不含 Capex）</td><td style="text-align:left;font-size:0.82em">需求侧·终端用户总支出</td></tr>
+<tr><td>②</td><td class="lft">GMF 供给侧实收</td><td><strong>~$160B</strong></td><td style="text-align:left;font-size:0.82em">供给侧已实现货币化营收（模型厂 API+订阅 + 云厂 AI 实收）</td><td style="text-align:left;font-size:0.82em">供给侧·真实货币化</td></tr>
+<tr><td>③</td><td class="lft">上游 Capex</td><td><strong>~$800B</strong></td><td style="text-align:left;font-size:0.82em">四大 Hyperscaler 资本开支</td><td style="text-align:left;font-size:0.82em">供给方投入</td></tr>
+<tr><td>④</td><td class="lft">OpenRouter 样本</td><td><strong>~$3B</strong></td><td style="text-align:left;font-size:0.82em">平台付费 token × 单价的支出代理</td><td style="text-align:left;font-size:0.82em">API 层·单平台样本</td></tr>
+<tr><td>⑤</td><td class="lft">全市场 LLM API</td><td><strong>~$16B</strong></td><td style="text-align:left;font-size:0.82em">全市场 API token 总量 × 单价</td><td style="text-align:left;font-size:0.82em">API 层·全市场</td></tr>
+<tr><td>⑥</td><td class="lft">企业 Foundation API</td><td><strong>~$12.5B</strong></td><td style="text-align:left;font-size:0.82em">企业付给模型厂的 API 费用</td><td style="text-align:left;font-size:0.82em">API 层·企业</td></tr>
+</table>
+<div class="note" style="background:#FFF7ED;border-left:3px solid #FDBA74;padding:8px 10px;margin-top:10px">⚠ <strong>跨期比较只用环比/同比，不比水平值</strong>（v0.23 新增）：② 与 ⑥、④ 与 ⑤ 各为同一口径对；而 <strong>OpenRouter 样本行的历史"水平值"不可跨拉取日比较</strong>——货币支出 = 付费 token × 混合单价，混合单价随价格表每次重拉而变（W35 $67.7M→$60.0M、W36 $94.9M→$86.3M，token 量未动）。本表数字为<strong>本期（2026-09-27）拉取口径</strong>。</div>
+<p style="font-size:0.82em;margin-top:10px"><strong>正确的关系链</strong>——最终端用户的钱大部分停在应用/产品层，只有少部分穿透到模型 API：</p>
+<pre style="font-size:0.8em;background:#F9FAFB;border:1px solid var(--border);border-radius:8px;padding:12px;margin:6px 0;overflow-x:auto">① 利润池 $1,000B（终端用户总支出）
+   ↓ 只有部分穿透到 API
+⑥ 企业 Foundation API $12.5B（模型层收入）
+   ↓ 乘以全市场倍数
+⑤ 全市场 LLM API $16B（含消费/开发者）
+   ↓ OpenRouter 占 ~1/5 全市场 API 支出
+④ OpenRouter 样本 $3B（单平台，偏开源低价）</pre>
+<div class="note">核心规则：④⑤⑥ 是 ① 的一个小切片（~1/60~1/300），<strong>用它算绝对量是错的，用它算增速是对的</strong>。用途分工——总量看①、货币化看②、上游投入看③、API 层增速/结构看④、API 绝对规模看⑤。</div>
+</div>
+
+<h2>乘数推导 · 不是常量，随数据更新</h2>
+<div class="card">
+<table>
+<tr><th style="text-align:left">层</th><th style="text-align:left">推导式</th><th>当前值</th><th style="text-align:left">置信度约束</th></tr>
+<tr><td class="lft">模型厂<br><span style="font-weight:400;color:var(--text2);font-size:.9em">（上游最粗管）</span></td><td style="text-align:left;font-size:0.82em">模型厂 capex（训练+推理）÷ 模型厂 ARR</td><td><span class="big-num">0.42</span><br><span style="font-size:.8em;color:var(--text2)">Anthropic 2026E<br>OI −$14B / ARR $44B</span></td><td style="text-align:left;font-size:0.8em">若 S-1 披露实际 capex → 用真实值替换（<strong>GAP②</strong>）</td></tr>
+<tr><td class="lft">云大厂<br><span style="font-weight:400;color:var(--text2);font-size:.9em">（中游）</span></td><td style="text-align:left;font-size:0.82em">四巨头 AI capex ÷ 四巨头云收入</td><td><span class="big-num">0.42</span><br><span style="font-size:.8em;color:var(--text2)">~$270-280B<br>/ ~$650B</span></td><td style="text-align:left;font-size:0.8em">分子依赖 AI capex 拆分披露（各家口径不一）</td></tr>
+<tr><td class="lft">企业终端<br><span style="font-weight:400;color:var(--text2);font-size:.9em">（下游）</span></td><td style="text-align:left;font-size:0.82em">企业终端到芯片的最终转化（<strong>三层衰减</strong>推断）</td><td><span class="big-num">0.06</span></td><td style="text-align:left;font-size:0.8em">⚠ <strong>推断值，最大不确定性来源</strong>（GAP③）；监控路径 = 企业 AI→云转化率</td></tr>
+</table>
+<div class="note">乘数 = 该层每 $1 收入能转化成多少上游芯片/网络支出。链越长乘数越低——企业终端经应用层→云→芯片三跳后只剩 6%。置信度提升路径 = 数据回填顺序 ①→②→③→⑥。</div>
+</div>
+
+<h2>三速时间序列 · 实际读数</h2>
+<div class="card">
+<table>
+<tr><th>季度</th><th>速度 B（正式版）</th><th>平台层总营收 YoY</th><th>gap₁</th><th>方向</th></tr>
+<tr><td class="lft">2025-Q1</td><td>+35.3</td><td>+12.5</td><td>+22.8</td><td style="color:var(--text2)">—</td></tr>
+<tr><td class="lft">2025-Q2</td><td>+31.7</td><td>+16.7</td><td>+15.0</td><td>gap 收窄</td></tr>
+<tr><td class="lft">2025-Q3</td><td>+29.8</td><td>+18.5</td><td>+11.3</td><td>gap 收窄</td></tr>
+<tr><td class="lft">2025-Q4</td><td>+29.4</td><td>+18.0</td><td>+11.4</td><td>gap 走平</td></tr>
+<tr><td class="lft">2026-Q1</td><td>+39.5</td><td>+22.4</td><td>+17.1</td><td>gap 扩大</td></tr>
+<tr><td class="lft">2026-Q2</td><td><strong>+55.6</strong>（正式版）</td><td>+22.4</td><td><strong>+33.2</strong></td><td>gap 扩大</td></tr>
+<tr style="background:#FFFBEB"><td class="lft">2026-Q3</td><td><strong>+79% ~ +86%</strong>（重估）</td><td>+22.4</td><td><strong>+57% ~ +64%</strong></td><td>gap 扩大</td></tr>
+</table>
+<div class="note">2026-Q2 的 +55.6% 为 v0.7 正式版（补入 L2 存储 + L4 网络 + L5 数据中心 + L7 电力后，较此前"凑合版" +30.9% 大幅上调）。2026-Q3 为重估值（AVGO FY26Q3 +85.5% YoY 落地、NVDA 数据中心 +106% 主导），待 Q3 财报季确认。</div>
+</div>
+
+<h2>⚠ 关键假设与不确定性（诚实清单）</h2>
+<div class="card">
+<table>
+<tr><th>#</th><th style="text-align:left">假设 / 不确定性</th><th style="text-align:left">对本模型的影响</th></tr>
+<tr><td>1</td><td style="text-align:left;font-size:0.84em"><strong>企业乘数 0.06 是推断值</strong>，非实测</td><td style="text-align:left;font-size:0.84em">下游衰减幅度无法直接验证 → 若实际更低，"净缺水 10-20%"会被低估</td></tr>
+<tr><td>2</td><td style="text-align:left;font-size:0.84em"><strong>前沿模型厂 ARR 二阶导已转负</strong>（Anthropic Q2 $115 亿但增速显著放缓、OpenAI Q2 仅 +18%）</td><td style="text-align:left;font-size:0.84em">速度 B 的最高乘数水龙头是模型厂（0.42 / +200%）→ <strong>速度 B 源头可能被高估，阶段Ⅲ 或比模型预估更早更陡</strong></td></tr>
+<tr><td>3</td><td style="text-align:left;font-size:0.84em"><strong>速度 B 权重含纯度折算</strong>（如 NVDA 只算 91%），纯度为估算</td><td style="text-align:left;font-size:0.84em">绝对量不可靠 → <strong>用增速方向，不用绝对量</strong>；M0 环节表是季度重估项</td></tr>
+<tr><td>4</td><td style="text-align:left;font-size:0.84em"><strong>环节内未按收入加权</strong></td><td style="text-align:left;font-size:0.84em">L1 中 NVDA 主导地位被等权低估 → 速度 B 可能低估</td></tr>
+<tr><td>5</td><td style="text-align:left;font-size:0.84em"><strong>OpenRouter 是高弹性开发者样本</strong></td><td style="text-align:left;font-size:0.84em">全市场增速 ≈ 它 × 0.3-0.5；看增速/结构，<strong>不看绝对量、不直接外推</strong></td></tr>
+<tr><td>6</td><td style="text-align:left;font-size:0.84em"><strong>Ramp（企业实付·月度）与 OpenRouter（开发者·周频）水平不可互替</strong></td><td style="text-align:left;font-size:0.84em">两者通缩幅度可不一致（Ramp 快于 OpenRouter）→ 分工使用：主锚点 vs 高频辅锚</td></tr>
+<tr><td>7</td><td style="text-align:left;font-size:0.84em"><strong>最新周为不完整周</strong>（抓取窗口止于昨日，系统性低估约 14%）</td><td style="text-align:left;font-size:0.84em">趋势判断<strong>一律以"完整周"为准</strong>，最新周只入 JSON 不入判断（v0.22 教训）</td></tr>
+<tr><td>8</td><td style="text-align:left;font-size:0.84em"><strong>平台层口径敏感性</strong>：总营收 vs AI 云口径</td><td style="text-align:left;font-size:0.84em">gap₁ 在 +57% 与 +1.6% 间摆动，<strong>换口径会翻转阶段解读</strong></td></tr>
+<tr><td>9</td><td style="text-align:left;font-size:0.84em"><strong>用量与货币化背离 —— 已二期确认</strong>（W38 用量 +1.7%·货币化 +13.9% → W39 用量 +2.3%·货币化 −5.1%·单价 −7%）</td><td style="text-align:left;font-size:0.84em">两者可同时为真——若为<strong>"涨价"而非"放量"</strong>，则速度 A 的"量"支柱弱化、增长更依赖价格档位上移；<strong>W39 二期已落定</strong>：量走平、价与货币化同跌 ⇒ 落入「量价同弱」分支（原 W38「涨价」分支被否）</td></tr>
+</table>
+<div class="note">本节是"已知偏差"的自我披露——读上方任何读数前请先过一遍。乘数的商业逻辑基础见 <code>research/ai-commercial-model-map-methodology.md</code>。</div>
+</div>
+
+</div>
+<div class="tab-content" id="tab3">
+<h2>三速框架 · 核心理念</h2>
+<div class="card">
+<table>
+<tr><th style="text-align:left">速度</th><th style="text-align:left">定义</th><th>当前读数</th><th style="text-align:left">周期含义</th></tr>
+<tr>
+<td class="lft">速度 A（buy）· 服务化支出</td>
+<td style="text-align:left;font-size:0.82em">企业对外购买 AI 服务/算力的经常性支出增速（buy·供给侧实收口径·不含自建算力 build）</td>
+<td><span class="tag tag-amber">分化（A″）</span></td>
+<td style="text-align:left;font-size:0.82em">GMF 合并口径 σ₀≈$144-180B（仅为上游 Capex ~1/50）· <strong>2026-10-11：<u>A″ 由上期「转弱」改为「分化」</u>——OpenRouter 用量与货币化在 W40 <u>回稳</u></strong>：付费量 <strong>+16.7%</strong>、货币支出 <strong>$120.5M（+6.5%）</strong>、有效单价 <strong>+10.8%</strong>（⚠W39/W40 均上修）。但 <strong>Ramp 企业实付层仍弱</strong>（日频单价通缩至 $0.824/M·Top1% 连续收缩）、且 <strong>BTOS 渗透率首次转平</strong>（23.8%·+0.0pp）。⇒ <strong>两条信源方向不一致</strong>，不再单边转弱、亦未确认回升。⚠ 按决策<strong>阶段Ⅰ维持（不切）</strong>；切换观察不解除</td>
+</tr>
+<tr>
+<td class="lft">平台传导层 · L6 Hyperscaler</td>
+<td style="text-align:left;font-size:0.82em">云收入增速 = 终端服务化支出(buy) + 乐观预期 + 内部消耗（含模型商训练算力费）</td>
+<td><span class="tag tag-red">膨胀中</span></td>
+<td style="text-align:left;font-size:0.82em">OpenAI 占 Azure RPO 45% · 云收入"撒谎"（把供给方资本承诺误报为需求）· gap₂ 度量乐观预期膨胀</td>
+</tr>
+<tr>
+<td class="lft">速度 B · 上游基建收入增速</td>
+<td style="text-align:left;font-size:0.82em">上游基建环节（L1-L5 硬件 + L7-L9 电力侧）从下游收钱的总收入增速</td>
+<td><span class="tag tag-red">更高</span></td>
+<td style="text-align:left;font-size:0.82em">四巨头 capex +89% · 模型厂 ARR 翻倍 · 长鞭效应放大上游增速</td>
+</tr>
+</table>
+<div class="conclusion">
+<h3>核心逻辑：三速对比 = 长鞭效应 + 环节流速差异 + 平台层自我膨胀</h3>
+<p style="font-size:0.88em">由于产业链传导的长鞭效应和每个环节支出流速（乘数）不同，三个速度的变化（二阶导）存在差异——这是周期划分的出发点。三阶段：<strong>Ⅰ 上游增速大幅提升 ＆ 终端服务化支出(buy)小幅提升（gap₁ 扩大）→ Ⅱ 上游放缓 ＆ 终端服务化支出(buy)追赶（gap₁ 收窄，可能有一段齐平）→ Ⅲ 上游进一步放缓 ＆ 终端服务化支出(buy)停止上升。</strong></p>
+<p style="font-size:0.85em;color:var(--text2);margin-top:8px">⚠ <strong>两个 gap + 二阶导判定</strong>：gap₁ = 速度B − 平台层（阶段定位主参考）；gap₂ = 平台层 − 速度A（buy）（乐观预期膨胀度量）。<strong>终端二次加速（A″&gt;0）时，即使 gap₁ 收窄也不能判阶段切换</strong>——可能是第二波长鞭正在形成。</p>
+</div>
+</div>
+
+
+<h2>L1-L9 产业链 · 上中下游映射</h2>
+<div class="card">
+<table>
+<tr><th style="text-align:left">位置</th><th style="text-align:left">环节</th><th>乘数特征</th><th>周期敏感度</th></tr>
+<tr>
+<td class="lft" rowspan="3">上游基建</td>
+<td style="text-align:left">L1 GPU/算力（含 ASIC）· L2 存储/HBM · L3 设备/EDA · L4 网络/光模块 · L5 数据中心</td>
+<td><span class="tag tag-amber">中高 0.2-0.42</span></td>
+<td><span class="tag tag-red">强</span> · 收入直接来自下游 Capex</td>
+</tr>
+<tr>
+<td class="lft">电力侧</td>
+<td style="text-align:left">L7 电力/散热 · L8 电网/公用事业 · L9 核能/铀矿</td>
+<td><span class="tag tag-amber">中</span></td>
+<td><span class="tag tag-blue">惯性最强</span> · 启动后数年才完成 · 阶段Ⅲ最抗跌</td>
+</tr>
+<tr>
+<td class="lft">平台传导层</td>
+<td style="text-align:left">L6 Hyperscaler / Neocloud（Neocloud 为 L6 子类）</td>
+<td><span class="tag tag-red">高 0.42</span></td>
+<td><span class="tag tag-blue">枢纽+放大器</span> · 混入乐观预期+内部消耗 · gap₂ 观测点</td>
+</tr>
+<tr>
+<td class="lft">中下游模型</td>
+<td style="text-align:left">前沿模型（L 序列外）</td>
+<td><span class="tag tag-red">最高 0.42</span></td>
+<td><span class="tag tag-red">强</span> · 上游资金流铜导线（高可变成本全额传导）</td>
+</tr>
+<tr>
+<td class="lft">下游应用</td>
+<td style="text-align:left">应用/软件（L 序列外）</td>
+<td><span class="tag tag-blue">极低 0.06</span></td>
+<td><span class="tag tag-amber">弱</span> · 终端支付衰减严重</td>
+</tr>
+</table>
+<div class="note">L 编号对齐权威 M1v2 九层（L6=云计算与AI平台、L7=数据中心电力与散热、L8=电网与公用事业、L9=核能与铀矿）。应用/软件、前沿模型在 L 序列之外。注意：L6 与前沿模型乘数都高但角色不同——L6 是平台传导层（买卖两端有定价权 + 混入乐观预期），前沿模型是铜导线（成本结构决定每 $1 API 收入 ~$0.42 全额传导上游）。阶段判定核心观测变量：gap₁（速度B−平台层）+ gap₂（平台层−终端服务化支出·buy）+ A″（buy 侧加速度）。</div>
+</div>
+
+
+<h2>三阶段定位（v0.4 · 三速 gap₁/gap₂/A″ 定义）</h2>
+<div class="card">
+<table>
+<tr><th>阶段</th><th>三速关系（核心定义）</th><th>模型厂乘数/增速</th><th>企业乘数/增速</th><th>上游净效应</th></tr>
+<tr>
+<td class="lft"><span class="tag tag-green">Ⅰ 上游扩张</span> · 当前</td>
+<td style="text-align:left;font-size:0.82em">上游增速 &gt;&gt; 平台层 &gt;&gt; 终端服务化支出(buy)，gap₁ 扩大</td>
+<td>0.42 / +200%</td>
+<td>0.06 / +25%</td>
+<td><span class="tag tag-green">洪流主导</span></td>
+</tr>
+<tr>
+<td class="lft"><span class="tag tag-amber">Ⅱ 收敛期</span> · 2-4个月</td>
+<td style="text-align:left;font-size:0.82em">上游增速放缓 ＆ 终端服务化支出(buy)追赶，gap₁ 收窄</td>
+<td><span class="tag tag-amber">0.30 / +80%</span></td>
+<td>0.07 / +30%</td>
+<td><span class="tag tag-amber">利润流速切换中</span></td>
+</tr>
+<tr>
+<td class="lft"><span class="tag tag-red">Ⅲ 同步放缓</span> · 4-8个月</td>
+<td style="text-align:left;font-size:0.82em">三速同步走弱，gap₁ 收窄到零或负</td>
+<td><span class="tag tag-red">0.20 / +30%</span></td>
+<td>0.08 / +30%</td>
+<td><span class="tag tag-red">净缺水10-20%</span></td>
+</tr>
+</table>
+<div class="note">阶段判定核心观测变量（优先级）：① gap₁（速度B − 平台层）→ ② gap₂（平台层 − 终端服务化支出·buy）= 乐观预期膨胀度量 → ③ A″（buy 侧服务化支出加速度，二次加速时 gap₁ 收窄≠阶段切换）→ ④ 前沿模型 capex 增速 → ⑤ 终端需求来源分解（长鞭衰减 vs 内生反馈）→ ⑥ 三速绝对水平。</div>
+<div class="conclusion">
+<h3>核心判断</h3>
+<p style="font-size:0.88em">模型厂水管的绝对直径决定上游水位。即使企业增速翻倍到50%、乘数从0.06涨到0.12——净增量~$12-15B也不够填补模型厂乘数从0.42→0.20产生的流速缺口~$26B。<strong>利润流速切换必然导致上游净支出下降10-20%。</strong>SOX翻倍已定价了当前洪流——而未定价的正是流速切换。</p>
+<p style="font-size:0.82em;color:var(--text2);margin-top:6px">⚠ 补充：以上基于「gap₁ 收窄 = 长鞭衰减」解读。若阶段Ⅱ判定终端服务化支出(buy)增速主要来自<strong>新场景涌现</strong>（内生反馈，A″&gt;0），上游净支出下降幅度可能被低估——需下调阶段Ⅲ的严重程度。且平台层混入乐观预期（OpenAI 占 Azure RPO 45%），真实 gap₁ 比表面读数更接近阶段Ⅱ。</p>
+</div>
+</div>
+
+
+<h2>6个触发信号监控</h2>
+<div class="card">
+<table>
+<tr><th style="text-align:left">#</th><th style="text-align:left">信号</th><th>当前状态</th><th style="text-align:left">下一个确认点</th><th>三速含义</th></tr>
+<tr>
+<td style="text-align:left">①</td>
+<td class="lft">模型厂 capEx 指引下修</td>
+<td><span class="tag tag-green">未触发</span><br><span style="font-size:0.78em;color:var(--text3)">Q2共识+10%（9月放缓论未改指引）</span></td>
+<td style="text-align:left;font-size:0.82em">10月底Q3财报 · Anthropic S-1(10月)</td>
+<td><span class="tag tag-red">gap收窄</span> · 上游资金流最敏感领先指标</td>
+</tr>
+<tr>
+<td style="text-align:left">②</td>
+<td class="lft">"算力短缺"叙事反转</td>
+<td><span class="tag tag-green">未触发</span><br><span style="font-size:0.78em;color:var(--text3)">NVDA $5000亿融资平台扩大需求(8/14)<br>↩ 反向证据：南方东英「GPU 租赁价 2026 起上行、A100 仍具韧性 → 折旧年限或长于 4–6 年」</span></td>
+<td style="text-align:left;font-size:0.82em">白牌GPU租赁价格 · NVDA backlog</td>
+<td><span class="tag tag-red">gap收窄</span> · 瓶颈环节溢价消失</td>
+</tr>
+<tr>
+<td style="text-align:left">③</td>
+<td class="lft">ARR 翻倍节奏衰减</td>
+<td><span class="tag tag-amber">👀观察中（v0.25 更新） Anthropic Q2营收预测&gt;$115亿(8/15)未衰减 · 9月开源权重压价 ↩ 南方东英口径：Anthropic ~$70亿 / OpenAI ~$200亿 量级未见衰减<br><strong>↩ 本期新增（2026-10-04）：Ramp 显示新增采用在减速</strong>——Anthropic 采用率 43.8%（+0.34pp）、OpenAI 39.8%（<strong>+0.09pp</strong>），且 Ramp 官方文章标题即《Cracks in the AI Thesis Part 2》<br>↩ <strong>本期（2026-10-11）：</strong>Ramp 月频仍停 8 月（无新股）；日频单价续降；<strong>BTOS 渗透率首次转平（+0.0pp）</strong>——采用端减速信号继续累积</span></td>
+<td style="text-align:left;font-size:0.82em">Anthropic S-1(10月) · OpenAI Q3</td>
+<td><span class="tag tag-amber">gap收窄</span> · 若①③④同时触发而③未触发→可能内生反馈</td>
+</tr>
+<tr>
+<td style="text-align:left">④</td>
+<td class="lft">模型厂定价行为恶化</td>
+<td><span class="tag tag-amber">⚠已有早期信号</span><br><span style="font-size:0.78em;color:var(--text3)">DS V4 Flash $0.027 · Grok4.6 $2/M(8/13) · 9月开源替代压力<br>↗ <strong>信号增强</strong>：南方东英「token 加权均价 6–8 月持续回落」+ Ramp 单价自 3 月峰值 −47.7% 互证<br>↩ ~~上期反向~~ <strong>本期重回转强（v0.25）</strong>：OpenRouter W39 有效单价 <strong>1.1421→1.0617（−7%）</strong>·Ramp 实付单价自峰值 <strong>−41%</strong>·前沿模型份额 53%→45%；<strong>Ramp 官方文章标题即「Cracks in the AI Thesis」</strong>——定价恶化上期大幅强化。<br>↩ <strong>本期（2026-10-11）回稳/往复</strong>：OpenRouter W40 有效单价 <strong>1.0343→1.1459（+10.8%）</strong>（含模型结构上移）；但 <strong>Ramp 企业实付端仍通缩</strong>（anthropic 日频 $0.824/M）——两口径分歧，<strong>信号强度由「强化」降为「分化」</strong></span></td>
+<td style="text-align:left;font-size:0.82em">Anthropic/OpenAI降价</td>
+<td><span class="tag tag-red">长鞭衰减</span> · 定价行为是机制判定的关键信号</td>
+</tr>
+<tr>
+<td style="text-align:left">⑤</td>
+<td class="lft">NVDA 客户结构变化</td>
+<td><span class="tag tag-green">未触发</span><br><span style="font-size:0.78em;color:var(--text3)">OpenAI 10GW+Anth 1GW</span></td>
+<td style="text-align:left;font-size:0.82em">NVDA下季客户拆分</td>
+<td><span class="tag tag-amber">gap收窄</span> · 客户结构转向主权/企业=水管变细</td>
+</tr>
+<tr>
+<td style="text-align:left">⑥</td>
+<td class="lft">上游 Capex 增速向 2028 路径收敛</td>
+<td><span class="tag tag-green">未触发</span><br><span style="font-size:0.78em;color:var(--text3)">当前2026 +85%<br>👁 新观察点：大摩把 2028 云 capex 增速指引 <strong>60%→12%</strong>（利润池 09-16）</span></td>
+<td style="text-align:left;font-size:0.82em">GHHK预测: 2027 +45% → 2028 +20%</td>
+<td><span class="tag tag-red">阶段III预警</span> · 增速向此路径收敛即锁定期切换方向</td>
+</tr>
+</table>
+<div style="background:#F0F9FF;border:1px solid #93C5FD;border-radius:10px;padding:14px 18px;margin-top:16px;font-size:0.84em;line-height:1.75">
+<strong style="color:var(--blue)">📌 9–10 月「放缓论」· 交叉输入信号 ①②④（整理于 2026-09-20 · v0.26 补 2026-10-11）</strong><br><span style="font-size:.86em">🆕 <strong>2026-09 新增一条独立信源</strong>：<strong>Ramp《Cracks in the AI Thesis Part 2》</strong>（2026-09-09，首席经济学家）——与其说是"模型厂放缓论"，不如说是<strong>买方自己的数据说企业AI支出在减速</strong>：Top1% 人均支出 −10.2%、有效单价自3月峰值 −41%、前沿模型 token 份额 53%→45%、企业在推"全公司默认"降低前沿模型用量。<strong>这是本模型速度 A 层的直接证据，而非言论层</strong>。另：Ramp 明确说明该现象<u>不是</u>开源/中国模型替代所致（仅 6.4% 的 AI 支出企业使用路由平台）。</span><br>
+<p style="margin-top:6px;color:var(--text2)"><strong>事件</strong>：Anthropic CEO Amodei <strong>9/12 发《我们必须为前沿设定节奏》</strong>，主张放慢并提三步计划；Sacks <strong>9/13 回怼</strong>「想慢自己慢，别要政府背书」；Altman <strong>9/14 表态同意放缓</strong>但「不等豁免或立法」，只提内部安全论证；<strong>9/15 All-In 峰会</strong>黄仁勋称「10% 灭绝是编的」、特朗普电话连线喊「这全是骗局」、马斯克主张「同行互测」并称「Dario 是对的」（只认危险判断）。OpenAI/Anthropic/Google/Meta <strong>1200+ 员工联署《Pacing the Frontier》</strong>。当日亚洲半导体股承压（SK 海力士 −5%、三星 −3%）。</p>
+<p style="margin-top:6px"><strong>⭐ 六人观点 × 立场坐标</strong>（源：《AI「减速」之争 · 人物简报》）——横轴"风险是夸大还是真实"、纵轴"要政府管还是行业自管"。<strong>只有 Dario 一人站在「要政府管 × 风险真实」</strong>；<strong>自治派</strong>（马斯克、奥特曼偏中）最可能落地；<strong>骗局派</strong>（特朗普、Sacks、黄仁勋）口径一致但程度不同——特朗普说"骗局"、Sacks 说"生意"、黄仁勋说"预测不科学"，共同点是不要政府插手。</p>
+<p style="margin-top:6px"><strong>⭐ 三套方案与落地难度</strong>：<strong>Dario</strong> 嵌入式评估（外部评估员进公司坐班，可不经审批发布结论）+ 政府反垄断豁免与立法 → <strong>最难</strong>（三步里两步要政府，而白宫 AI 操盘手公开反对）；<strong>奥特曼</strong> 内部安全论证（每次大训练前自写论证）→ <strong>最易但最无约束力</strong>；<strong>马斯克</strong> 同行互测（发布前互开 API，各用各的测试套件，靠舆论+产品责任法执行）→ <strong>中等，最接近白宫口径</strong>。</p>
+<p style="margin-top:6px"><strong>基层反弹是真实且跨党派的</strong>：32 州 321 项数据中心暂停/限制（19 红州 13 蓝州，各占本阵营约 2/3）；NY 州长 EO62 第 62 号行政令（7/14，50MW 以上州级环评暂停约 1 年）与 TX 州长 8/3 叫停新数据中心并网是两个已生效的<strong>全州级</strong>暂停。→ 这解释了特朗普为何把反对定性为"骗局"——中期选举前，数据中心议题民调"负 80"，连本党候选人都在提暂停令。</p>
+<p style="margin-top:6px"><strong>⚠ 对本模型最相关的一层（汇丰 9/14）</strong>：这是<strong>向上游硬件供应商争取议价能力</strong>的战略转向，而非技术路线转向——"模型越先进，越需要在先进基础设施上投入资本支出"，实验室集体表态实质是向供应商要价。→ <strong>直接指向模型厂乘数（本模型最高水龙头 0.42）</strong>：若议价成立，乘数有下行压力。</p>
+<p style="margin-top:6px"><strong>其余三层解读</strong>：① <strong>不削减总投入</strong>（花旗）——是资本开支从<strong>前沿训练转向推理/部署</strong>；② <strong>成本反向上行</strong>（巴克莱 9/15）——安全"节奏控制"使 2027 年起训练与推理算力 <strong>+18%</strong>（推理 +20%），2027 新增监控算力成本 $440 亿 / 2028 $750 亿；③ <strong>实际未降速</strong>（反证）——杰富瑞 Big3+Oracle 待处理订单 <strong>+188% 至 $2.3T</strong>、2026 capex <strong>$8,110 亿（+82%）</strong>；Alphabet 启动 Gemini 4 预训练；Anthropic 9/2 仍发 Fable 5.1。<strong>另一重反证（v0.23 新增，源：南方东英）</strong>：GPU 租赁价格 2026 年起持续上行、A100 仍具韧性——若真在减速，租赁价格应先行回落。</p>
+<p style="margin-top:6px"><strong>压力侧</strong>：中金提示开源模型（尤其中国厂商）凭低价与开放权重形成替代压力、模型端缺可持续差异化壁垒；智堡点出"囚徒困境"——没有哪家公司能承受单方面减速。市场真正的焦点已从"是否放缓"转向 <strong>AI 投资 ROI 确定性</strong>（美银 7 月调查：45% 基金经理视 AI 泡沫为最大尾部风险，高于 6 月 28%）。</p>
+<p style="margin-top:8px"><strong>→ 判定（v0.26 更新 · 2026-10-11）</strong>：<strong>信号 ④「定价行为恶化」本期<u>由「大幅强化」降为「分化」</u></strong>——OpenRouter W40 有效单价回升（1.0343→1.1459·+10.8%，含模型结构上移），但 <strong>Ramp 企业实付端仍通缩</strong>（anthropic 日频 $0.824/M），两口径分歧。<strong>信号 ③「ARR 翻倍节奏衰减」维持观察中</strong>，且本期新增一条证据——<strong>BTOS 渗透率首次转平</strong>（23.8%·+0.0pp，此前 +0.8/+0.6/+0.6）。<strong>信号 ①②⑤⑥ 未触发</strong>（capex 指引未改、模型发布未停、客户结构无新披露、无新财报）。<strong>下一期最直接的验证点</strong>：① <strong>Ramp 月度是否推进到 9 月数据</strong>（当前仍停 8 月、官方文章未发）；② <strong>云 AI 收入 Q3 增速</strong>（10 月底）；③ <strong>BTOS 转平是否连续第二期</strong>。注：用量代理已于 v0.25 由「总量」改为「付费token」；本期 OpenRouter 取 <strong>完整周 W40</strong>（W41 未完整、不入判断）。</p>
+</div>
+</div>
+
+
+</div>
+<div class="tab-content" id="tab4">
+<div class="card">
+<h3>数据源分层原则</h3>
+<p style="font-size:0.85em"><strong>数据源分层 = 频率分层 = 质量分层。</strong></p>
+<p style="font-size:0.83em;color:var(--text2);margin-top:6px">下游结论的置信度<strong>不能超过其最弱数据层</strong>——A 层（财报硬数据）直接决定速度 B / 平台层 / gap₁，其余层只能做边际修正或方向确认，不能推翻 A 层结论。</p>
+<table style="margin-top:10px">
+<tr><th>层</th><th>频率</th><th>质量</th></tr>
+<tr><td class="lft" style="font-size:0.82em">A · 财报硬数据</td><td style="font-size:0.8em">季度</td><td><span class="tag tag-green">🟢 一手权威</span></td></tr>
+<tr><td class="lft" style="font-size:0.82em">A′ · 官方数据 API</td><td style="font-size:0.8em">周频</td><td><span class="tag tag-green">🟢 高</span></td></tr>
+<tr><td class="lft" style="font-size:0.82em">B · 半结构化快照</td><td style="font-size:0.8em">周度</td><td><span class="tag tag-amber">🟡 中高</span></td></tr>
+<tr><td class="lft" style="font-size:0.82em">C · 事件性锚点</td><td style="font-size:0.8em">事件驱动</td><td><span class="tag tag-amber">🟡 中·口径需注意</span></td></tr>
+</table>
+</div>
+
+<h2>数据源分层 · 频率分层 = 质量分层</h2>
+<div class="card">
+<h3 style="font-size:.92em;margin-bottom:6px">A 层 · 财报硬数据（季度 · 🟢 一手权威）</h3>
+<table>
+<tr><th style="text-align:left">数据</th><th style="text-align:left">来源</th><th style="text-align:left">做法</th></tr>
+<tr><td class="lft" style="font-size:0.82em">速度 B 成分<br><span style="font-weight:400;color:var(--text2)">上游季度收入</span></td><td style="text-align:left;font-size:0.78em">FMP income-statement</td><td style="text-align:left;font-size:0.78em">NVDA/TSM/AVGO/AMD/MU/ANET + L2 存储 SNDK/WDC + L3 设备 ASML/AMAT/LRCX/KLAC + L5 DC DLR/EQIX/AMT + L7 电力 ETN/GEV/PWR/VRT/NEE/DUK → 各环节 YoY × M0 权重</td></tr>
+<tr><td class="lft" style="font-size:0.82em">平台层</td><td style="text-align:left;font-size:0.78em">FMP income-statement</td><td style="text-align:left;font-size:0.78em">GOOGL/MSFT/AMZN/META 四家总营收均值 YoY</td></tr>
+<tr><td class="lft" style="font-size:0.82em">云 AI 收入增速</td><td style="text-align:left;font-size:0.78em">MSFT/GOOGL/AMZN 电话会</td><td style="text-align:left;font-size:0.78em">Azure/AWS/GCP 增速 → gap₂ 核心输入（需人工从电话会摘录）</td></tr>
+<tr><td class="lft" style="font-size:0.82em">四巨头 capex</td><td style="text-align:left;font-size:0.78em">财报指引</td><td style="text-align:left;font-size:0.78em">汇总 2026 指引（当前 ~$630-710B）</td></tr>
+<tr><td class="lft" style="font-size:0.82em">NVDA 客户拆分 / backlog</td><td style="text-align:left;font-size:0.78em">NVDA 财报 + transcript</td><td style="text-align:left;font-size:0.78em">拆模型厂/企业/主权；供应承诺是否转向（$95.2B / 5M GPU）</td></tr>
+<tr><td class="lft" style="font-size:0.82em">速度 A 上界锚点<br><span style="font-weight:400;color:var(--text2)">Ramp AI Index</span></td><td style="text-align:left;font-size:0.78em">Datawrapper dataset.csv<br><span style="color:var(--text2)">（2026-09-13 改版后新取数法）</span></td><td style="text-align:left;font-size:0.78em"><strong>月度</strong>（token 单价为日频）。企业人均 AI 支出（中位/Top10%/Top1%）+ 采用率 + 有效 token 单价。样本 7 万+ 美国企业（偏科技/VC·绝对水平高估，<strong>用增速方向</strong>）。取数见流程手册 §六</td></tr>
+<tr><td class="lft" style="font-size:0.82em">速度 A 下界锚点<br><span style="font-weight:400;color:var(--text2)">Census BTOS</span></td><td style="text-align:left;font-size:0.78em">census.gov 数据表<br><span style="color:var(--text2)">（Cloudflare 拦自动拉取 403）</span></td><td style="text-align:left;font-size:0.78em"><strong>双周</strong>。全国 AI 采用率（当前用 + 预期未来 6 个月用）。⚠ 2025-11 起为新口径（"任何业务功能"），旧口径不可比</td></tr>
+</table>
+
+<h3 style="font-size:.92em;margin:16px 0 6px">A′ 层 · 官方数据 API（连续序列 · 周频 · 🟢 高）</h3>
+<table>
+<tr><th style="text-align:left">数据</th><th style="text-align:left">端点 / 脚本</th><th style="text-align:left">用途与限制</th></tr>
+<tr><td class="lft" style="font-size:0.82em">OpenRouter 周 token 序列</td><td style="text-align:left;font-size:0.78em"><code>scripts/openrouter_weekly_fetch.py</code><br>→ <code>scan_data/openrouter_weekly_tokens.json</code></td><td style="text-align:left;font-size:0.78em">速度 A 用量代理的<strong>最高质量序列</strong>。默认<strong>滚动增量</strong>（100 天窗口 + DB 历史合并·成本恒定）；每次拉取自动落 <strong>PIT 快照</strong>（<code>openrouter_weekly_snapshot</code>, 主键 week+fetched_at）。<strong>⚠ 完整周规则</strong>：最新周不完整，趋势判断只看完整周</td></tr>
+<tr><td class="lft" style="font-size:0.82em">按模型 / 日期拆分</td><td style="text-align:left;font-size:0.78em">同端点 <code>rankings-daily</code></td><td style="text-align:left;font-size:0.78em">结构分析：周内 Top 模型、中国 vs 美国份额</td></tr>
+<tr><td class="lft" style="font-size:0.82em">按应用拆分</td><td style="text-align:left;font-size:0.78em"><code>scripts/app_rankings_fetch.py</code><br>→ <code>scan_data/app_rankings_weekly.json</code></td><td style="text-align:left;font-size:0.78em">编码 agent 负载占比 = "编码场景用量 A″"周频领先代理。⚠ <strong>属高弹性开发者负载，非低弹性企业负载</strong>——不能用来验证"价格战利好平台层"</td></tr>
+</table>
+<div class="note">OpenRouter 是"风向标"（增速/结构可信），不是"温度计"（绝对量/单价不能外推全市场）——货币化判断须用云 AI 收入交叉验证（约全市场 1/4 token、1/5 API 支出）。</div>
+
+<h3 style="font-size:.92em;margin:16px 0 6px">B 层 · 半结构化快照（周度 · 🟡 中高）</h3>
+<table>
+<tr><th style="text-align:left">数据</th><th style="text-align:left">脚本 / 来源</th><th style="text-align:left">做法</th></tr>
+<tr><td class="lft" style="font-size:0.82em">AA 单位成本快照</td><td style="text-align:left;font-size:0.78em"><code>scripts/artificial_analysis.py</code> → <code>aa_model_snapshot</code></td><td style="text-align:left;font-size:0.78em"><strong>必须每周跑</strong>；累积 ≥8 期后可算"单位任务成本下降加速度"（A″ 基本面燃料）——当前第 6 期，是数据基建最大待积累项</td></tr>
+<tr><td class="lft" style="font-size:0.82em">token 价格 / Pareto 前沿</td><td style="text-align:left;font-size:0.78em">AA</td><td style="text-align:left;font-size:0.78em">跟踪 Pareto 前沿成本是否继续下移</td></tr>
+</table>
+
+<h3 style="font-size:.92em;margin:16px 0 6px">C 层 · 事件性锚点（事件驱动 · 🟡 中·口径需注意）</h3>
+<table>
+<tr><th style="text-align:left">数据</th><th style="text-align:left">来源</th><th style="text-align:left">做法</th></tr>
+<tr><td class="lft" style="font-size:0.82em">模型厂 ARR</td><td style="text-align:left;font-size:0.78em">Anthropic S-1 / OpenAI 披露 / 三方估算</td><td style="text-align:left;font-size:0.78em">跟踪"每 6 周翻倍"节奏是否衰减（信号③）</td></tr>
+<tr><td class="lft" style="font-size:0.82em">模型厂 capex</td><td style="text-align:left;font-size:0.78em">Anthropic 内部计划 / OpenAI 披露</td><td style="text-align:left;font-size:0.78em">更新模型厂乘数（0.42 基于 OI −$14B / ARR $44B）</td></tr>
+<tr><td class="lft" style="font-size:0.82em">推理量事件</td><td style="text-align:left;font-size:0.78em">L2 事件层（Mikko/财报/行业）</td><td style="text-align:left;font-size:0.78em">DigitalOcean +800%、Token 60 天 ×30 倍等 → 速度 A 证据</td></tr>
+</table>
+<div class="note">C 层<strong>口径不统一</strong>（Ramp 样本偏科技/VC、BTOS 是新口径、模型厂 ARR 是估算）——只能做 A″ 判断的辅助确认，<strong>不能量化绝对水平</strong>。与 A 层、A′ 层交叉验证时方向一致才可信。</div>
+</div>
+
+<h2>数据 GAP 清单（7 条 · 对齐方法论 §4.2）</h2>
+<div class="card">
+<div class="note" style="margin-top:0;margin-bottom:8px">⚠ 编号与方法论文档 <code>§4.2</code> 严格对齐——正文中"数据缺口②③"这类引用均指此编号。<strong>此前 HTML 漏了第 ⑤ 条，导致后两条降号</strong>（文档⑥↔HTML⑤、文档⑦↔HTML⑥），现已修正。</div>
+<table>
+<tr><th style="text-align:left">GAP</th><th>影响</th><th style="text-align:left">当前状态</th><th style="text-align:left">补法</th></tr>
+<tr><td class="lft" style="font-size:0.82em">① NVDA 客户结构精确拆分<br><span style="font-weight:400;color:var(--text2)">（ACIE 内部分层）</span></td><td><span class="tag tag-red">★★★</span></td><td style="text-align:left;font-size:0.78em">NVDA 只拆 Hyperscale / ACIE——模型厂 vs 企业 vs 主权<strong>未细分</strong>。FY27Q2 数据中心 $96.2B 已落地（2026-08）</td><td style="text-align:left;font-size:0.78em">NVDA 下季 earnings transcript 精读</td></tr>
+<tr><td class="lft" style="font-size:0.82em">② 模型厂 capex 精确值</td><td><span class="tag tag-amber">★★</span></td><td style="text-align:left;font-size:0.78em">乘数 0.42 <strong>基于计划数、非实际执行</strong></td><td style="text-align:left;font-size:0.78em">10 月 Anthropic S-1 披露硬数字</td></tr>
+<tr><td class="lft" style="font-size:0.82em">③ 企业 AI→云转化率</td><td><span class="tag tag-red">★★★</span></td><td style="text-align:left;font-size:0.78em">0.06 为三层衰减<strong>推断值</strong>——最大不确定性来源</td><td style="text-align:left;font-size:0.78em">MSFT/AMZN 披露云收入中 AI 占比</td></tr>
+<tr><td class="lft" style="font-size:0.82em">④ 主权/超算稳定性</td><td><span class="tag tag-gray">★</span></td><td style="text-align:left;font-size:0.78em">增速数据缺失</td><td style="text-align:left;font-size:0.78em">地缘变量，暂不依赖</td></tr>
+<tr style="background:#FFFBEB"><td class="lft" style="font-size:0.82em">⑤ 云内部 AI / 非 AI 拆分<br><span style="font-weight:400;color:#92400E">（此前 HTML 遗漏）</span></td><td><span class="tag tag-amber">★★</span></td><td style="text-align:left;font-size:0.78em">四巨头 capex 里 AI 占比是估算（65-70%），口径未统一</td><td style="text-align:left;font-size:0.78em">统一口径，财报附注</td></tr>
+<tr><td class="lft" style="font-size:0.82em">⑥ GMF 合并口径逐季更新</td><td><span class="tag tag-red">★★★</span></td><td style="text-align:left;font-size:0.78em">σ₀ = $144-180B 仅一次估算（2026-07）。<strong>部分解决</strong>：Ramp（上界·月度）+ BTOS（下界·双周）双锚点已上线；σ₀ 绝对值仍待逐季刷新</td><td style="text-align:left;font-size:0.78em">每季用 OpenAI/Anthropic 财报 + 云厂 AI 披露刷新（Ramp 取数已通，见流程手册 §六）</td></tr>
+<tr><td class="lft" style="font-size:0.82em">⑦ 训练 vs 推理算力费拆分</td><td><span class="tag tag-amber">★★</span></td><td style="text-align:left;font-size:0.78em">OpenAI 付 Azure 的大头是训练，但<strong>比例未知</strong></td><td style="text-align:left;font-size:0.78em">财报附注 + 三方估算</td></tr>
+</table>
+</div>
+
+<h2>模型结构缺口（6 条 · 对齐方法论 §4.3）</h2>
+<div class="card">
+<table>
+<tr><th>#</th><th style="text-align:left">缺口</th><th style="text-align:left">为什么重要</th></tr>
+<tr><td>1</td><td style="text-align:left;font-size:0.84em"><strong>缺少"三速指标的时间序列"</strong></td><td style="text-align:left;font-size:0.82em">需至少 8 个季度历史回填，画出三条曲线才能正式定位阶段——当前三阶段仍是定性框架</td></tr>
+<tr><td>2</td><td style="text-align:left;font-size:0.84em">缺少"云内部 AI / 非 AI"拆分</td><td style="text-align:left;font-size:0.82em">四巨头 capex 的 AI 占比是估算（65-70%），实际口径未统一（= <strong>GAP⑤</strong>）</td></tr>
+<tr><td>3</td><td style="text-align:left;font-size:0.84em">缺少价格弹性传导量化</td><td style="text-align:left;font-size:0.82em">token 降价 → 需求弹性（Jevons）的弹性系数无硬数据，目前是定性"量升价跌"</td></tr>
+<tr><td>4</td><td style="text-align:left;font-size:0.84em">缺少对 SMH/SOXX 等上游 ETF 的直接映射</td><td style="text-align:left;font-size:0.82em">模型输出的是"上游净支出方向"，尚未映射到具体可交易标的的偏配幅度</td></tr>
+<tr><td>5</td><td style="text-align:left;font-size:0.84em">缺少"三速 gap 的机制分解"工具</td><td style="text-align:left;font-size:0.82em">阶段Ⅱ判定需区分长鞭衰减 vs 内生反馈（gap₁/gap₂/A″ 组合），目前为定性判断</td></tr>
+<tr><td>6</td><td style="text-align:left;font-size:0.84em">缺少"终端服务化支出"独立度量</td><td style="text-align:left;font-size:0.82em">平台层（Hyperscaler 总营收）混入乐观预期与内部消耗，需 GMF 口径 + AA token 消耗独立度量（= <strong>GAP⑥</strong>）</td></tr>
+</table>
+</div>
+
+
+</div>
+
+
+<p class="note" style="margin-top:24px"><strong>v0.26 · 2026-10-11</strong> · ① 数据推进至 <strong>W40 完整周</strong>（付费 147.22T / 货币 $120.5M / 单价 1.1459）——⚠ <strong>W39/W40 本次拉取均上修</strong>（W39 付费 112.29T→126.15T），历史水平不可跨拉取日比较；② ⭐ <strong>A″ 由上期「转弱」改为「分化」</strong>：OpenRouter 用量 +16.7%、货币化 +6.5%、单价 +10.8% 在 W40 回稳，但 Ramp 企业实付层仍弱（日频单价通缩至 $0.824/M·Top1% 连续收缩）、且 <strong>BTOS 渗透率首次转平</strong>（23.8%·+0.0pp）——两条信源方向不一致；③ <strong>阶段Ⅰ维持（按决策不切）</strong>，切换观察不解除、新增「BTOS 转平」触发记录；④ ★ <strong>Ramp 取数法重建</strong>——旧 Datawrapper 彻底失效，数据改内嵌 Next.js RSC payload（整页 10.3MB），新脚本 <code>ramp_ai_index_fetch.py</code> 抽出 26 个数据集、<code>ramp_ai_index_rebuild_csv.py</code> 重设 <strong>5 张新图</strong>（采用率/人均支出/单价/模型份额/AI支出占比），退役 tier-mix 与 serving-share；⑤ AA 第 11 期（697 模型）· app-rankings W40 61.78T（编码 81.1%）· OpenRouter 取完整周 W40（W41 未完整、不入判断）；⑥ <strong>触发信号 ④ 强度由「强化」降为「分化」</strong>（W40 单价回升 vs Ramp 仍通缩）。
+<p class="note" style="margin-top:10px"><strong>v0.25 · 2026-10-04</strong> · ① ⭐ <strong>用量代理口径修订</strong>：由「总token」改为「<strong>付费token</strong>」——免费占比 W38 8.7%→W39 16.2% 是<strong>复发型尖峰</strong>（W28/W29 曾 17.5%→24.9% 后回落至 ~9%），且免费层与"企业服务化支出"无关；继续用总量会把免费驱动的 +13.1% 误读成终端需求加速，而<strong>付费口径只有 +2.3%</strong>；② ⚠ <strong>A″ 转弱，本期最实质的变化</strong>——付费量走平 +2.3%、有效单价 −7%（1.1421→1.0617）、货币化 −5.1%；③ ★ <strong>第二条独立信源同向</strong>：Ramp 企业实付层单价自3月峰值 −41% 至 $0.68、前沿模型 token 份额 53%→45%、Top1% 人均 −10.2%，官方文章标题即《Cracks in the AI Thesis Part 2》；④ <strong>阶段Ⅰ维持但改标"末期特征显现"，置信度 高→中</strong>——切换未确认（gap₁ 未收窄、BTOS 仍扩散、Ramp 负增长尚属单期）；⑤ <strong>BTOS 与 Ramp 本期均无新期</strong>（202620 与 Ramp 10月期均约 10/8 发布，为下期最直接验证点）；⑥ AA 第 10 期（690 模型）· 前沿封闭份额 W39 17.8% · app-rankings W39 44.35T（编码 83.3%）；⑦ <strong>触发信号 ④ 大幅强化</strong>。
+<p class="note" style="margin-top:10px"><strong>v0.24 · 2026-09-27</strong> · ① 数据推进至 <strong>W38 完整周</strong>（128.90T / $109.8M / 单价 <strong>1.0249</strong>）——货币化同口径 <strong>+13.9%</strong>、均价破 $1.0；但<strong>用量环比仅 +1.7%</strong>（前值 +9.8%·<strong>增速骤降</strong>）⇒ 更像<strong>结构上移（档位/价格）而非总量扩张</strong>；② ★ <strong>BTOS 新期 202619</strong>（采集 09-07~09-20）：采用率 <strong>23.8%</strong>（+0.6pp）· 预期 <strong>27.6%</strong>（+0.3pp）——渗透率扩散未见顶；③ ⚠ <strong>BTOS 文件名改版</strong>：<code>National.xlsx</code> → <code>National260920.xlsx</code>（日期戳命名），流程手册 v0.14.1 的自检命令因硬编码旧名而失效——又是一例「把当前恰好成立当成永远成立」；④ 前沿封闭份额 W38 回落至 <strong>19.1%</strong>（W37 25.8%）· 开源升至 <strong>43.8%</strong>；编码 agent 占应用用量 85.8%（31.11T）；⑤ <strong>触发信号 ④ 本期反向</strong>（均价破 $1.0）· 新增跟踪项「用量增速是否连续两期 &lt;+3%」；⑥ <strong>阶段Ⅰ维持</strong>（置信度高），但「用量高增」支柱首次出现减速。
+<p class="note" style="margin-top:10px"><strong>v0.23 · 2026-09-20</strong> · ① 数据推进至 <strong>W37 完整周</strong>（126.76T / $96.8M / 单价 $0.894）——用量周环比 <strong>+9.8%</strong>、货币化同口径 <strong>+12.2%</strong>、月环比 +68%/+54%；② ⚠ <strong>口径重述</strong>：货币化"水平值"随价格表重算而漂移（W35 $67.7M→$60.0M、W36 $94.9M→$86.3M，<strong>token 量分毫未动</strong>）⇒ <strong>历史水平不可跨拉取日比较，只有同一次拉取内的环比/同比有效</strong>；单价"稳定在 $1.0 附近"的旧结论作废（W37 $0.894）；③ <strong>修正 <code>openrouter_charts.py</code> 违反自定纪律的缺陷</strong>——原实现取 <code>series[-1]</code>（不完整周）当基准，与"趋势判断一律以完整周为准"自相矛盾，且环比基准印错；现按"周结束日 &lt; 今天"过滤；④ <strong>放缓论块升级</strong>：六人观点×立场坐标（只有 Dario 站在"要政府管×风险真实"）、三套方案与落地难度、32 州 321 项数据中心暂停（19 红 13 蓝）、两条 watch（OpenAI 是否真接受外部审计 / 马斯克互测有没有人接）；⑤ 触发信号 ②③④⑥ 补证据（南方东英《八个"鬼故事"》+ 大摩 2028 云 capex 增速 60%→12%）；⑥ BTOS 202618（23.2%/27.3%）与 Ramp 2026-08 <strong>均无新期</strong>；⑦ <strong>阶段Ⅰ维持</strong>。</p>
+<p class="note" style="margin-top:10px"><strong>v0.22 · 2026-09-13</strong> · ① ⚠ <strong>口径陷阱纠偏</strong>：OpenRouter 最新周为不完整周（系统性低估 ~14%·实测 W36 由 101.18T 上修至 115.46T），<strong>趋势判断一律以完整周为准</strong>；② <strong>终端未见顶</strong>（完整周口径）：W36 用量 +2.2%、货币化 <strong>+40%</strong>、BTOS <strong>23.2%</strong>（+0.8pp）；③ <strong>速度 B 上修 +79%~+86%</strong>（AVGO FY26Q3 +85.5% YoY 落地）、gap₁ +57%~+64%；④ ★ <strong>Ramp 企业端首个孤立反向信号</strong>：token 单价自 3月峰值 −47.7%、Top1% 人均支出 −10.2% MoM（序列首次收缩）；⑤ <strong>阶段Ⅰ维持·置信度高</strong>；⑥ Ramp token 单价确立为速度 A 货币化主锚点（人类决定）；⑦ Ramp 取数改版适配（Datawrapper dataset.csv，见流程手册 §六）<br>
+<strong>v0.21(2026-09-06)</strong>：PIT 快照表 <code>openrouter_weekly_snapshot</code>（主键 week+fetched_at·保留调取时点对齐）+ 拉取改<strong>滚动增量</strong>（RECENT_DAYS=100 天窗口·成本恒定），<code>--full</code> 保留为首次/校正用<br>
+<strong>v0.20(2026-09-06)</strong>：W36 增量 + 数据修订更正——全量重拉推翻 v0.17「货币化连续 3 周下滑」（W35 99.68T/$60.4M 上修至 113T/$67.5M·日频延迟补全）；货币化预警解除。<strong>教训：趋势判断须以全量重拉口径为准，勿用单次增量读数下结论</strong><br>
+<strong>v0.19(2026-09-04)</strong>：口径修订——速度 A 窄化为 buy(服务化支出)·删 A_true/真实需求·build(自建算力)归速度 B 供给侧覆盖<br>
+<strong>v0.16(2026-08-25) 历史</strong>：开发者→企业桥接框架（§2.6）：app-rankings 编码agent负载（编码场景用量A″周频代理）+ 前沿vs开源份额 + 传导系数 k≈0.30（编码agent→Copilot，待10月验证）+ 弹性梯度（Ramp韧性 vs OpenRouter脆弱）· OpenRouter 连续序列（86周·Data API·CC BY 4.0）+ 货币化指标（总货币支出/加权平均单价/免费占比）· 无序竞争质变（用量vs货币化脱钩·Ox Alpha 免费抢量）· 样本代表性边界（增速可用·单价不外推）· 六口径分层（API层样本不可外推终端支出）· 速度 B 正式版+55.6%（Q2）· gap₁ +33.2% · 阶段Ⅰ上游扩张 · 数据: M0公司级TRC表+FMP income-statement+Ramp/BTOS锚点+OpenRouter(app-rankings/frontier_share)</p>
+</div>
+
+<script>
+(function(){
+  var btns = document.querySelectorAll('.tab-btn');
+  var tabs = {};
+  btns.forEach(function(b){ tabs[b.dataset.tab] = document.getElementById(b.dataset.tab); });
+  btns.forEach(function(b){
+    b.addEventListener('click', function(){
+      btns.forEach(function(x){ x.classList.remove('active'); });
+      b.classList.add('active');
+      Object.keys(tabs).forEach(function(k){ if(tabs[k]) tabs[k].classList.remove('active'); });
+      if(tabs[b.dataset.tab]) tabs[b.dataset.tab].classList.add('active');
+    });
+  });
+})();
+</script>
+</body>
+</html>
